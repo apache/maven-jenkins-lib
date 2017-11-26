@@ -19,14 +19,18 @@ def call(Map params = [:]) {
       tasks[stageId] = {
         node(label) {
           stage("Checkout ${stageId}") {
-            checkout scm
+            dir('m') {
+              checkout scm
+            }
           }
           stage("Build ${stageId}") {
             withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository') {
-              if (isUnix()) {
-                sh 'mvn clean verify'
-              } else {
-                bat 'mvn clean verify'
+              dir ('m') {
+                if (isUnix()) {
+                  sh 'mvn clean verify'
+                } else {
+                  bat 'mvn clean verify'
+                }
               }
             }
           }
