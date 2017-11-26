@@ -10,6 +10,7 @@ def call(Map params = [:]) {
       String label = jenkinsEnv.labelForOS(os);
       String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
       String mvnName = jenkinsEnv.mvnFromVersion(os, "${maven}")
+      echo "OS: ${os} JDK: ${jdk} Maven: ${maven} => Label: ${label} JDK: ${jdkName} Maven: ${mvnName}"
       if (label == null || jdkName == null || mvnName == null) {
         continue;
       }
