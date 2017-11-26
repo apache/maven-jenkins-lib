@@ -1,6 +1,6 @@
 def call(Map params = [:]) {
   def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
-  def jdks = params.containsKey('jdks') ? params.jdks : ['7','8']
+  def jdks = params.containsKey('jdks') ? params.jdks : ['7','8','9']
   def maven = params.containsKey('maven') ? params.maven : '3.x.x'
   def failFast = params.containsKey('failFast') ? params.failFast : true
   Map tasks = [failFast: failFast]
@@ -12,6 +12,7 @@ def call(Map params = [:]) {
       String mvnName = jenkinsEnv.mvnFromVersion(os, "${maven}")
       echo "OS: ${os} JDK: ${jdk} Maven: ${maven} => Label: ${label} JDK: ${jdkName} Maven: ${mvnName}"
       if (label == null || jdkName == null || mvnName == null) {
+        echo "Skipping ${os}-jdk${jdk} as unsupported by Jenkins Environment"
         continue;
       }
       String stageId = "${os}-jdk${jdk}"
