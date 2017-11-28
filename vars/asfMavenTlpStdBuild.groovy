@@ -39,5 +39,18 @@ def call(Map params = [:]) {
       first = false
     }
   }
-  return parallel(tasks)
+  def buildRetention
+  if (env.BRANCH_NAME == 'master') {
+    buildRetention = buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '3', daysToKeepStr: '21', numToKeepStr: '25'))
+  } else {
+    buildRetention = buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '1', daysToKeepStr: '7', numToKeepStr: '5'))
+  }
+  properties([buildRetention])
+  try {
+    parallel(tasks)
+    jenkinsNotify()
+  } catch (exc) {
+    jenkinsNotify()
+    throw exc
+  }
 }
