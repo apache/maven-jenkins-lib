@@ -48,6 +48,20 @@ def call(Map params = [:]) {
   properties([buildRetention])
   try {
     parallel(tasks)
+    currentBuild.result = "SUCCESS"
+    // JENKINS-34376 seems to make it hard to detect the aborted builds
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    // this ambiguous condition means a user probably aborted
+    if (e.causes.size() == 0) {
+      currentBuild.result = "ABORTED"
+    } 
+    throw e
+  } catch (hudson.AbortException e) {
+    // this ambiguous condition means during a shell step, user probably aborted
+    if (e.getMessage().contains('script returned exit code 143')) {
+      currentBuild.result = "ABORTED"
+    }
+    throw e
   } finally {
     stage("Notifications") {
       jenkinsNotify()      
