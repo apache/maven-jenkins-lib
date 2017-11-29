@@ -27,9 +27,9 @@ def call(Map params = [:]) {
             withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository') {
               dir ('m') {
                 if (isUnix()) {
-                  sh 'mvn clean verify'
+                  sh 'mvn clean verify -Dmaven.test.failure.ignore=true -Dfindbugs.failOnError=false'
                 } else {
-                  bat 'mvn clean verify'
+                  bat 'mvn clean verify -Dmaven.test.failure.ignore=true -Dfindbugs.failOnError=false'
                 }
               }
             }
