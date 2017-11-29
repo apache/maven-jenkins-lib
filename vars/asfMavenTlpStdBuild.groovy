@@ -48,9 +48,9 @@ def call(Map params = [:]) {
   properties([buildRetention])
   try {
     parallel(tasks)
-    jenkinsNotify()
-  } catch (exc) {
-    jenkinsNotify()
-    throw exc
+  } finally {
+    stage("Notifications") {
+      jenkinsNotify()      
+    }    
   }
 }
