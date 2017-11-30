@@ -56,15 +56,14 @@ def call(Map params = [:]) {
               }
             }
             stage("Build ${stageId}") {
-              dev withMavenOptions = [
+              withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
                 artifactsPublisher(disabled: !first),
                 junitPublisher,
                 findbugsPublisher(disabled: !first),
                 openTasksPublisher(disabled: !first),
                 dependenciesFingerprintPublisher,
                 invokerPublisher
-              ]
-              withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: withMavenOptions) {
+              ]) {
                 dir ('m') {
                   if (isUnix()) {
                     sh "mvn clean verify -Dmaven.test.failure.ignore=true -Dfindbugs.failOnError=false -Dfindbugs.skip=${!first} -P+run-its"
