@@ -56,6 +56,17 @@ def call(Map params = [:]) {
               }
             }
             stage("Build ${stageId}") {
+              def cmd = [
+                'mvn',
+                '-P+run-its',
+                '-Dmaven.test.failure.ignore=true',
+                '-Dfindbugs.failOnError=false',
+              ]
+              if (!first) {
+                cmd += '-Dfindbugs.skip=true'
+              }
+              cmd += 'clean'
+              cmd += 'verify'
               withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
                 artifactsPublisher(disabled: !first),
                 junitPublisher(ignoreAttachments: false),
@@ -67,9 +78,9 @@ def call(Map params = [:]) {
               ]) {
                 dir ('m') {
                   if (isUnix()) {
-                    sh "mvn clean verify -Dmaven.test.failure.ignore=true -Dfindbugs.failOnError=false -Dfindbugs.skip=${!first} -P+run-its"
+                    sh cmd.join(' ')
                   } else {
-                    bat "mvn clean verify -Dmaven.test.failure.ignore=true -Dfindbugs.failOnError=false -Dfindbugs.skip=${!first} -P+run-its"
+                    bat cmd.join(' ')
                   }
                 }
               }
