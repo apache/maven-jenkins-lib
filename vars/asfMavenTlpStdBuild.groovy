@@ -58,11 +58,12 @@ def call(Map params = [:]) {
             stage("Build ${stageId}") {
               withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
                 artifactsPublisher(disabled: !first),
-                junitPublisher,
+                junitPublisher(ignoreAttachments: false),
                 findbugsPublisher(disabled: !first),
                 openTasksPublisher(disabled: !first),
-                dependenciesFingerprintPublisher,
-                invokerPublisher
+                dependenciesFingerprintPublisher(),
+                invokerPublisher(),
+                pipelineGraphPublisher()
               ]) {
                 dir ('m') {
                   if (isUnix()) {
