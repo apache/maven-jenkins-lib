@@ -47,6 +47,17 @@ def call(Map params = [:]) {
           echo "Skipping ${os}-jdk${jdk} as unsupported by Jenkins Environment"
           continue;
         }
+        def cmd = [
+          'mvn',
+          '-P+run-its',
+          '-Dmaven.test.failure.ignore=true',
+          '-Dfindbugs.failOnError=false',
+        ]
+        if (!first) {
+          cmd += '-Dfindbugs.skip=true'
+        }
+        cmd += 'clean'
+        cmd += 'verify'
         String stageId = "${os}-jdk${jdk}"
         tasks[stageId] = {
           node(label) {
@@ -56,17 +67,6 @@ def call(Map params = [:]) {
               }
             }
             stage("Build ${stageId}") {
-              def cmd = [
-                'mvn',
-                '-P+run-its',
-                '-Dmaven.test.failure.ignore=true',
-                '-Dfindbugs.failOnError=false',
-              ]
-              if (!first) {
-                cmd += '-Dfindbugs.skip=true'
-              }
-              cmd += 'clean'
-              cmd += 'verify'
               withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
                 artifactsPublisher(disabled: !first),
                 junitPublisher(ignoreAttachments: false),
