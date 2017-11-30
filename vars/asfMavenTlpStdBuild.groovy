@@ -58,6 +58,7 @@ def call(Map params = [:]) {
         }
         cmd += 'clean'
         cmd += 'verify'
+        def disablePublishers = !first
         String stageId = "${os}-jdk${jdk}"
         tasks[stageId] = {
           node(label) {
@@ -68,10 +69,10 @@ def call(Map params = [:]) {
             }
             stage("Build ${stageId}") {
               withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
-                artifactsPublisher(disabled: !first),
+                artifactsPublisher(disabled: disablePublishers),
                 junitPublisher(ignoreAttachments: false),
-                findbugsPublisher(disabled: !first),
-                openTasksPublisher(disabled: !first),
+                findbugsPublisher(disabled: disablePublishers),
+                openTasksPublisher(disabled: disablePublishers),
                 dependenciesFingerprintPublisher(),
                 invokerPublisher(),
                 pipelineGraphPublisher()
