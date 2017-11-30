@@ -56,8 +56,8 @@ def call(Map params = [:]) {
               }
             }
             stage("Build ${stageId}") {
-              withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', artifactsPublisher(disabled: !first),
-                findbugsPublisher(disabled: !first), openTasksPublisher(disabled: !first)) {
+              withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [artifactsPublisher(disabled: !first),
+                findbugsPublisher(disabled: !first), openTasksPublisher(disabled: !first)}) {
                 dir ('m') {
                   if (isUnix()) {
                     sh "mvn clean verify -Dmaven.test.failure.ignore=true -Dfindbugs.failOnError=false -Dfindbugs.skip=${!first}"
