@@ -133,7 +133,7 @@ def call(Map params = [:]) {
   } finally {
     // notify completion
     if (failingFast != null) {
-      echo "***** FAST FAILURE *****\n\nFast failure triggered by ${failingFast}\n'n***** FAST FAILURE *****"
+      echo "***** FAST FAILURE *****\n\nFast failure triggered by ${failingFast}\n\n***** FAST FAILURE *****"
     }
     stage("Notifications") {
       jenkinsNotify()
