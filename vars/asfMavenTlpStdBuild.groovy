@@ -20,6 +20,7 @@
  */
 
 def call(Map params = [:]) {
+  def failingFast = null
   try {
     // set build retention time first
     def buildRetention
@@ -37,7 +38,6 @@ def call(Map params = [:]) {
     def failFast = params.containsKey('failFast') ? params.failFast : true
     Map tasks = [failFast: failFast]
     boolean first = true
-    def failingFast = null
     for (String os in oses) {
       for (def jdk in jdks) {
         String label = jenkinsEnv.labelForOS(os);
@@ -60,6 +60,7 @@ def call(Map params = [:]) {
         cmd += 'clean'
         cmd += 'verify'
         def disablePublishers = !first
+        first = false
         String stageId = "${os}-jdk${jdk}"
         tasks[stageId] = {
           node(label) {
@@ -101,7 +102,6 @@ def call(Map params = [:]) {
             }
           }
         }
-        first = false
       }
     }
     // run the parallel builds
@@ -132,11 +132,11 @@ def call(Map params = [:]) {
     throw e
   } finally {
     // notify completion
+    if (failingFast != null) {
+      echo "Fast failure triggered by ${failingFast}"
+    }
     stage("Notifications") {
       jenkinsNotify()
-      if (failingFast != null) {
-        echo "Fast failure triggered by ${failingFast}"
-      }
     }
   }
 }
