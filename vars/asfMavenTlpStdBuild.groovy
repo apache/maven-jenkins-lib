@@ -37,6 +37,7 @@ def call(Map params = [:]) {
     def failFast = params.containsKey('failFast') ? params.failFast : true
     Map tasks = [failFast: failFast]
     boolean first = true
+    boolean failingFast = false
     for (String os in oses) {
       for (def jdk in jdks) {
         String label = jenkinsEnv.labelForOS(os);
@@ -78,10 +79,19 @@ def call(Map params = [:]) {
                 pipelineGraphPublisher()
               ]) {
                 dir ('m') {
-                  if (isUnix()) {
-                    sh cmd.join(' ')
-                  } else {
-                    bat cmd.join(' ')
+                  try {
+                    if (isUnix()) {
+                      sh cmd.join(' ')
+                    } else {
+                      bat cmd.join(' ')
+                    }
+                  } catch (Throwable e) {
+                    if (!failFast || !failingFast) {
+                      failingFast = true
+                      throw e
+                    } else {
+                      echo "Failing fast, ignoring ${e.message}"
+                    }
                   }
                 }
               }
