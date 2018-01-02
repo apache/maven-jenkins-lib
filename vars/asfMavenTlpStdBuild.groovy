@@ -65,38 +65,52 @@ def call(Map params = [:]) {
         tasks[stageId] = {
           node(label) {
             stage("Checkout ${stageId}") {
-              dir('m') {
-                checkout scm
+              try {
+                dir('m') {
+                  checkout scm
+                }
+              } catch (Throwable e) {
+                if (!failFast) {
+                  throw e
+                } else if (failingFast == null) {
+                  failingFast = stageId
+                  echo "[FAIL FAST] This is the first failure and likely root cause"
+                  throw e
+                } else {
+                  echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
+                }
               }
             }
             stage("Build ${stageId}") {
-              withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
-                artifactsPublisher(disabled: disablePublishers),
-                junitPublisher(ignoreAttachments: false),
-                findbugsPublisher(disabled: disablePublishers),
-                openTasksPublisher(disabled: disablePublishers),
-                dependenciesFingerprintPublisher(),
-                invokerPublisher(),
-                pipelineGraphPublisher()
-              ]) {
+              if (failingFast != null) {
+                echo "[FAIL FAST] ${failingFast} has failed. Skipping ${stageId}."
+              } else try {
+                withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
+                  artifactsPublisher(disabled: disablePublishers),
+                  junitPublisher(ignoreAttachments: false),
+                  findbugsPublisher(disabled: disablePublishers),
+                  openTasksPublisher(disabled: disablePublishers),
+                  dependenciesFingerprintPublisher(),
+                  invokerPublisher(),
+                  pipelineGraphPublisher()
+                ]) {
                 dir ('m') {
-                  try {
                     if (isUnix()) {
                       sh cmd.join(' ')
                     } else {
                       bat cmd.join(' ')
                     }
-                  } catch (Throwable e) {
-                    if (!failFast) {
-                      throw e
-                    } else if (failingFast == null) {
-                      failingFast = stageId
-                      echo "[FAIL FAST] This is the first failure and likely root cause"
-                      throw e
-                    } else {
-                      echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
-                    }
                   }
+                }
+              } catch (Throwable e) {
+                if (!failFast) {
+                  throw e
+                } else if (failingFast == null) {
+                  failingFast = stageId
+                  echo "[FAIL FAST] This is the first failure and likely root cause"
+                  throw e
+                } else {
+                  echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
                 }
               }
             }
