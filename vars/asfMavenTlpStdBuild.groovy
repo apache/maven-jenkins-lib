@@ -67,7 +67,12 @@ def call(Map params = [:]) {
             stage("Checkout ${stageId}") {
               try {
                 dir('m') {
-                  checkout(changelog: !disablePublishers, scm: scm)
+                  if (disablePublishers) {
+                    // second and subsequent parallel executions should skip changelog
+                    checkout(changelog: false, scm: scm)
+                  } else {
+                    checkout scm
+                  }
                 }
               } catch (Throwable e) {
                 if (!failFast) {
