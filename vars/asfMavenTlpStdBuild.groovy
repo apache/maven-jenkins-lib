@@ -67,7 +67,7 @@ def call(Map params = [:]) {
             stage("Checkout ${stageId}") {
               try {
                 dir('m') {
-                  checkout scm
+                  checkout(changelog: !disablePublishers, scm: scm)
                 }
               } catch (Throwable e) {
                 if (!failFast) {
