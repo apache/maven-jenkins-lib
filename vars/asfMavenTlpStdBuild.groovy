@@ -37,7 +37,7 @@ def call(Map params = [:]) {
     def failFast = params.containsKey('failFast') ? params.failFast : true
     Map tasks = [failFast: failFast]
     boolean first = true
-    boolean failingFast = false
+    def failingFast = null
     for (String os in oses) {
       for (def jdk in jdks) {
         String label = jenkinsEnv.labelForOS(os);
@@ -86,11 +86,14 @@ def call(Map params = [:]) {
                       bat cmd.join(' ')
                     }
                   } catch (Throwable e) {
-                    if (!failFast || !failingFast) {
-                      failingFast = true
+                    if (!failFast) {
+                      throw e
+                    } else if (failingFast == null) {
+                      failingFast = "${os}-jdk${jdk}"
+                      echo "[FAIL FAST] This is the first failure and likely root cause"
                       throw e
                     } else {
-                      echo "Failing fast, ignoring ${e.message}"
+                      echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
                     }
                   }
                 }
@@ -130,7 +133,10 @@ def call(Map params = [:]) {
   } finally {
     // notify completion
     stage("Notifications") {
-      jenkinsNotify()      
-    }    
+      jenkinsNotify()
+      if (failingFast != null) {
+        echo "Fast failure triggered by ${failingFast}"
+      }
+    }
   }
 }
