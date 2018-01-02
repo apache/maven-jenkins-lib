@@ -69,6 +69,7 @@ def call(Map params = [:]) {
                 dir('m') {
                   if (disablePublishers) {
                     // second and subsequent parallel executions should skip changelog
+                    echo "Skipping duplicate changelog during checkout"
                     checkout(changelog: false, scm: scm)
                   } else {
                     checkout scm
