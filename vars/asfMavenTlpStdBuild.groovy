@@ -90,7 +90,7 @@ def call(Map params = [:]) {
                     if (!failFast) {
                       throw e
                     } else if (failingFast == null) {
-                      failingFast = "${os}-jdk${jdk}"
+                      failingFast = stageId
                       echo "[FAIL FAST] This is the first failure and likely root cause"
                       throw e
                     } else {
@@ -133,7 +133,7 @@ def call(Map params = [:]) {
   } finally {
     // notify completion
     if (failingFast != null) {
-      echo "Fast failure triggered by ${failingFast}"
+      echo "***** FAST FAILURE *****\n\nFast failure triggered by ${failingFast}\n'n***** FAST FAILURE *****"
     }
     stage("Notifications") {
       jenkinsNotify()
