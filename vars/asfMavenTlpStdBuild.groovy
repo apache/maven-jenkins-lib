@@ -58,7 +58,13 @@ def call(Map params = [:]) {
           cmd += '-Dfindbugs.skip=true'
         }
         cmd += 'clean'
-        cmd += 'verify'
+        def branchName = "${env.BRANCH_NAME}"
+        if(branchName == "master") {
+          cmd += 'deploy'   
+          cmd += "-DdeployAtEnd=true"
+        } else {
+          cmd += 'verify'        
+        } 
         def disablePublishers = !first
         first = false
         String stageId = "${os}-jdk${jdk}"
@@ -85,15 +91,17 @@ def call(Map params = [:]) {
               if (failingFast != null) {
                 echo "[FAIL FAST] ${failingFast} has failed. Skipping ${stageId}."
               } else try {
-                withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
-                  artifactsPublisher(disabled: disablePublishers),
-                  junitPublisher(ignoreAttachments: false),
-                  findbugsPublisher(disabled: disablePublishers),
-                  openTasksPublisher(disabled: disablePublishers),
-                  dependenciesFingerprintPublisher(),
-                  invokerPublisher(),
-                  pipelineGraphPublisher()
-                ]) {
+                withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', 
+                          mavenSettingsConfig: 'simple-deploy-settings-no-mirror',
+                          options: [
+                            artifactsPublisher(disabled: disablePublishers),
+                            junitPublisher(ignoreAttachments: false),
+                            findbugsPublisher(disabled: disablePublishers),
+                            openTasksPublisher(disabled: disablePublishers),
+                            dependenciesFingerprintPublisher(),
+                            invokerPublisher(),
+                            pipelineGraphPublisher()
+                          ]) {
                 dir ('m') {
                     if (isUnix()) {
                       sh cmd.join(' ')
