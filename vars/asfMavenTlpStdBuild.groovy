@@ -92,8 +92,8 @@ def call(Map params = [:]) {
               if (failingFast != null) {
                 echo "[FAIL FAST] ${failingFast} has failed. Skipping ${stageId}."
               } else try {
+                // mavenSettingsConfig: 'simple-deploy-settings-no-mirror',
                 withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', 
-                          mavenSettingsConfig: 'simple-deploy-settings-no-mirror',
                           options: [
                             artifactsPublisher(disabled: disablePublishers),
                             junitPublisher(ignoreAttachments: false),
