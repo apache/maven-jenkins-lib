@@ -57,14 +57,18 @@ def call(Map params = [:]) {
         if (!first) {
           cmd += '-Dfindbugs.skip=true'
         }
+        if (jdk == '7') {
+          // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
+          cmd += '-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2'
+        }
         cmd += 'clean'
         def branchName = "${env.BRANCH_NAME}"
         //if(branchName == "master") {
-        //  cmd += 'deploy'   
+        //  cmd += 'deploy'
         //  cmd += "-DdeployAtEnd=true"
         //} else {
-        //  cmd += 'verify'        
-        cmd += 'verify'        
+        //  cmd += 'verify'
+        cmd += 'verify'
         //} 
         def disablePublishers = !first
         first = false
