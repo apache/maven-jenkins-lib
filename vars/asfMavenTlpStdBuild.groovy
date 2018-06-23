@@ -59,7 +59,7 @@ def call(Map params = [:]) {
         }
         if (jdk == '7') {
           // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
-          cmd += '-Dhttps.protocols=TLSv1,TLSv1.1,TLSv1.2'
+          cmd += '-Dhttps.protocols=TLSv1.2'
         }
         cmd += 'clean'
         def branchName = "${env.BRANCH_NAME}"
