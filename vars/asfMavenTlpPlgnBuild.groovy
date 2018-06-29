@@ -106,6 +106,10 @@ def doCreateTask( os, jdk, maven, tasks, first, failFast, failingFast )
 	if (!first) {
 	  cmd += '-Dfindbugs.skip=true'
 	}
+	if (jdk == '7') {
+	  // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
+	  cmd += '-Dhttps.protocols=TLSv1.2'
+	}
 	cmd += 'clean'
 	cmd += 'verify'
 	def disablePublishers = !first
