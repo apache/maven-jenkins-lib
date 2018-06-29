@@ -43,11 +43,11 @@ def call(Map params = [:]) {
       for (def mvn in mavens) {
 	    def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
 		jdks = jdks.findAll{ it != jdk }
-	    doCreateTask( os, jdk, mvn, tasks, first )
+	    doCreateTask( os, jdk, mvn, tasks, first, failFast )
       }
       for (def jdk in jdks) {
 	    def mvn = jenkinsEnv.mavenForJdk(jdk)
-	    doCreateTask( os, jdk, mvn, tasks, first )
+	    doCreateTask( os, jdk, mvn, tasks, first, failFast )
       }
     }
     // run the parallel builds
@@ -87,7 +87,7 @@ def call(Map params = [:]) {
   }
 }
 
-def doCreateTask( os, jdk, maven, tasks, first )
+def doCreateTask( os, jdk, maven, tasks, first, failFast )
 {
 	String label = jenkinsEnv.labelForOS(os);
 	String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
