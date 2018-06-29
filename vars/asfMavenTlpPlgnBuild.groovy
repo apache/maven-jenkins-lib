@@ -96,7 +96,7 @@ def call(Map params = [:]) {
   }
 }
 
-def doCreateTask( os, jdk, maven, goals, tasks, first, plan, taskContext )
+def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 {
 	String label = jenkinsEnv.labelForOS(os);
 	String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
