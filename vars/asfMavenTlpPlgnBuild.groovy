@@ -18,8 +18,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
- 
-def failingFast = null
 
 def call(Map params = [:]) {
   try {
@@ -38,17 +36,18 @@ def call(Map params = [:]) {
     def jdkMin = jdks[0];
     def mavens = params.containsKey('maven') ? params.maven : ['3.0.x','3.2.x','3.3.x','3.5.x']
     def failFast = params.containsKey('failFast') ? params.failFast : true
+    def taskContext = [failFast: failFast];
     Map tasks = [failFast: failFast]
     boolean first = true
     for (String os in oses) {
       for (def mvn in mavens) {
 	    def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
 		jdks = jdks.findAll{ it != jdk }
-	    doCreateTask( os, jdk, mvn, tasks, first, failFast )
+	    doCreateTask( os, jdk, mvn, tasks, first, taskContext )
       }
       for (def jdk in jdks) {
 	    def mvn = jenkinsEnv.mavenForJdk(jdk)
-	    doCreateTask( os, jdk, mvn, tasks, first, failFast )
+	    doCreateTask( os, jdk, mvn, tasks, first, taskContext )
       }
     }
     // run the parallel builds
@@ -79,8 +78,8 @@ def call(Map params = [:]) {
     throw e
   } finally {
     // notify completion
-    if (failingFast != null) {
-      echo "***** FAST FAILURE *****\n\nFast failure triggered by ${failingFast}\n\n***** FAST FAILURE *****"
+    if (taskContext.failingFast != null) {
+      echo "***** FAST FAILURE *****\n\nFast failure triggered by ${taskContext.failingFast}\n\n***** FAST FAILURE *****"
     }
     stage("Notifications") {
       jenkinsNotify()
@@ -88,7 +87,7 @@ def call(Map params = [:]) {
   }
 }
 
-def doCreateTask( os, jdk, maven, tasks, first, failFast )
+def doCreateTask( os, jdk, maven, tasks, first, taskContext )
 {
 	String label = jenkinsEnv.labelForOS(os);
 	String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
@@ -124,20 +123,20 @@ def doCreateTask( os, jdk, maven, tasks, first, failFast )
 			  checkout scm
 			}
 		  } catch (Throwable e) {
-			if (!failFast) {
+			if (!taskContext.failFast) {
 			  throw e
-			} else if (failingFast == null) {
-			  failingFast = stageId
+			} else if (taskContext.failingFast == null) {
+			  taskContext.failingFast = stageId
 			  echo "[FAIL FAST] This is the first failure and likely root cause"
 			  throw e
 			} else {
-			  echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
+			  echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
 			}
 		  }
 		}
 		stage("Build ${stageId}") {
-		  if (failingFast != null) {
-			echo "[FAIL FAST] ${failingFast} has failed. Skipping ${stageId}."
+		  if (taskContext.failingFast != null) {
+			echo "[FAIL FAST] ${taskContext.failingFast} has failed. Skipping ${stageId}."
 		  } else try {
 			withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
 			  artifactsPublisher(disabled: disablePublishers),
@@ -157,14 +156,14 @@ def doCreateTask( os, jdk, maven, tasks, first, failFast )
 			  }
 			}
 		  } catch (Throwable e) {
-			if (!failFast) {
+			if (!taskContext.failFast) {
 			  throw e
-			} else if (failingFast == null) {
-			  failingFast = stageId
+			} else if (taskContext.failingFast == null) {
+			  taskContext.failingFast = stageId
 			  echo "[FAIL FAST] This is the first failure and likely root cause"
 			  throw e
 			} else {
-			  echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
+			  echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
 			}
 		  }
 		}
