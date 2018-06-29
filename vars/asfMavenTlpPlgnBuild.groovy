@@ -37,6 +37,9 @@ def call(Map params = [:]) {
     def jdkMin = jdks[0];
     def mavens = params.containsKey('maven') ? params.maven : ['3.0.x','3.2.x','3.3.x','3.5.x']
     def failFast = params.containsKey('failFast') ? params.failFast : true
+    def siteJdk = params.containsKey('siteJdk') ? params.siteJdk : '8'
+    def siteMvn = params.containsKey('siteMvn') ? params.siteJdk : '3.5.x'
+    
     taskContext['failFast'] = failFast;
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -44,12 +47,17 @@ def call(Map params = [:]) {
       for (def mvn in mavens) {
 	    def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
 		jdks = jdks.findAll{ it != jdk }
-	    doCreateTask( os, jdk, mvn, tasks, first, taskContext )
+	    doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
       }
       for (def jdk in jdks) {
 	    def mvn = jenkinsEnv.mavenForJdk(jdk)
-	    doCreateTask( os, jdk, mvn, tasks, first, taskContext )
+	    doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
       }
+      
+      doCreateTask( os, siteJdk, siteMvn, tasks, first, 'site', taskContext )
+      
+      // run with apache-release profile, consider it a dryRun with SNAPSHOTs
+      // doCreateTask( os, siteJdk, siteMvn, tasks, first, 'release', taskContext )
     }
     // run the parallel builds
     parallel(tasks)
@@ -88,7 +96,7 @@ def call(Map params = [:]) {
   }
 }
 
-def doCreateTask( os, jdk, maven, tasks, first, taskContext )
+def doCreateTask( os, jdk, maven, goals, tasks, first, plan, taskContext )
 {
 	String label = jenkinsEnv.labelForOS(os);
 	String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
@@ -111,11 +119,23 @@ def doCreateTask( os, jdk, maven, tasks, first, taskContext )
 	  // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
 	  cmd += '-Dhttps.protocols=TLSv1.2'
 	}
-	cmd += 'clean'
-	cmd += 'verify'
+
+	if (plan == 'build') {
+      cmd += 'clean'
+      cmd += 'verify'
+	}
+	else if (plan == 'site') {
+      cmd += 'site'
+      cmd += '-Preporting'
+	}
+	else if (plan == 'release') {
+      cmd += 'verify'
+      cmd += '-Papache-release'
+	}
+	
 	def disablePublishers = !first
 	first = false
-	String stageId = "${os}-jdk${jdk}_m${maven}"
+	String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
 	tasks[stageId] = {
 	  node(label) {
 		stage("Checkout ${stageId}") {
