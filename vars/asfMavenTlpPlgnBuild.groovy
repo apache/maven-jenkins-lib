@@ -148,7 +148,7 @@ def doCreateTask( os, jdk, maven, tasks, first, taskContext )
 			  invokerPublisher(),
 			  pipelineGraphPublisher()
 			]) {
-			dir ('m') {
+			dir (stageId) {
 				if (isUnix()) {
 				  sh cmd.join(' ')
 				} else {
