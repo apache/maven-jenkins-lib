@@ -120,7 +120,7 @@ def doCreateTask( os, jdk, maven, tasks, first, taskContext )
 	  node(label) {
 		stage("Checkout ${stageId}") {
 		  try {
-			dir('m') {
+			dir(stageId) {
 			  checkout scm
 			}
 		  } catch (Throwable e) {
