@@ -109,7 +109,7 @@ def doCreateTask( os, jdk, maven, tasks )
 	cmd += 'verify'
 	def disablePublishers = !first
 	first = false
-	String stageId = "${os}-jdk${jdk}"
+	String stageId = "${os}-jdk${jdk}_m${maven}"
 	tasks[stageId] = {
 	  node(label) {
 		stage("Checkout ${stageId}") {
