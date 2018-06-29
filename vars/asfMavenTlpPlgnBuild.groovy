@@ -34,13 +34,14 @@ def call(Map params = [:]) {
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['7','8','9','10']
+    def jdkMin = jdks[0];
     def mavens = params.containsKey('maven') ? params.maven : ['3.0.x','3.1.x','3.2.x','3.3.x','3.5.x']
     def failFast = params.containsKey('failFast') ? params.failFast : true
     Map tasks = [failFast: failFast]
     boolean first = true
     for (String os in oses) {
       for (def mvn in mavens) {
-	    def jdk = jenkinsEnv.jdkForMaven(mvn)
+	    def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
 		jdks = jdks.findAll{ it != jdk }
 	    doCreateTask( os, jdk, mvn, tasks, first )
       }
