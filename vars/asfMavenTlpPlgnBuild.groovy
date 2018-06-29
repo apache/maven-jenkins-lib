@@ -41,7 +41,7 @@ def call(Map params = [:]) {
     for (String os in oses) {
       for (def mvn in mavens) {
 	    def jdk = jenkinsEnv.jdkForMaven(mvn)
-		jdks.remove(jdk)
+		jdks = removeFromCollection(jdks,jdk)
 	    doCreateTask( os, jdk, mvn, tasks )
       }
       for (def jdk in jdks) {
@@ -85,6 +85,13 @@ def call(Map params = [:]) {
     }
   }
 }
+
+// org.jenkinsci.plugins.scriptsecurity.sandbox.RejectedAccessException:
+//    Scripts not permitted to use method java.util.Collection remove java.lang.Object
+def removeFromCollection( list, item )
+{
+  list.stream().filter{ it != item }.collect()
+} 
 
 def doCreateTask( os, jdk, maven, tasks )
 {
