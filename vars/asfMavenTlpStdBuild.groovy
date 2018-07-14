@@ -76,7 +76,8 @@ def call(Map params = [:]) {
         first = false
         String stageId = "${os}-jdk${jdk}"
         tasks[stageId] = {
-          node(label) {
+		  // exclude probamatic nodes with && !nodename
+          node("${label} && !ubuntu-eu2") {
             stage("Checkout ${stageId}") {
               try {
                 dir('m') {
