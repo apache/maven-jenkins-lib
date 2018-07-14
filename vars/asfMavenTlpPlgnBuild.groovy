@@ -139,56 +139,58 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 	String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
 	tasks[stageId] = {
 	  node(label) {
-		stage("Checkout ${stageId}") {
-		  try {
-			dir(stageId) {
-			  checkout scm
-			}
-		  } catch (Throwable e) {
-			if (!taskContext.failFast) {
-			  throw e
-			} else if (taskContext.failingFast == null) {
-			  taskContext.failingFast = stageId
-			  echo "[FAIL FAST] This is the first failure and likely root cause"
-			  throw e
-			} else {
-			  echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
-			}
-		  }
-		}
-		stage("Build ${stageId}") {
-		  if (taskContext.failingFast != null) {
-			echo "[FAIL FAST] ${taskContext.failingFast} has failed. Skipping ${stageId}."
-		  } else try {
-			withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
-			  artifactsPublisher(disabled: disablePublishers),
-			  junitPublisher(ignoreAttachments: false),
-			  findbugsPublisher(disabled: disablePublishers),
-			  openTasksPublisher(disabled: disablePublishers),
-			  dependenciesFingerprintPublisher(),
-			  invokerPublisher(),
-			  pipelineGraphPublisher()
-			]) {
-			dir (stageId) {
-				if (isUnix()) {
-				  sh cmd.join(' ')
-				} else {
-				  bat cmd.join(' ')
-				}
-			  }
-			}
-		  } catch (Throwable e) {
-			if (!taskContext.failFast) {
-			  throw e
-			} else if (taskContext.failingFast == null) {
-			  taskContext.failingFast = stageId
-			  echo "[FAIL FAST] This is the first failure and likely root cause"
-			  throw e
-			} else {
-			  echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
-			}
-		  }
-		}
+      stage("Checkout ${stageId}") {
+        try {
+          dir(stageId) {
+            checkout scm
+          }
+        } catch (Throwable e) {
+          if (!taskContext.failFast) {
+            throw e
+          } else if (taskContext.failingFast == null) {
+            taskContext.failingFast = stageId
+            echo "[FAIL FAST] This is the first failure and likely root cause"
+            throw e
+          } else {
+            echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
+          }
+        }
+      }
+      stage("Build ${stageId}") {
+        if (taskContext.failingFast != null) {
+          echo "[FAIL FAST] ${taskContext.failingFast} has failed. Skipping ${stageId}."
+        } else try {
+          withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
+            artifactsPublisher(disabled: disablePublishers),
+            junitPublisher(ignoreAttachments: false),
+            findbugsPublisher(disabled: disablePublishers),
+            openTasksPublisher(disabled: disablePublishers),
+            dependenciesFingerprintPublisher(),
+            invokerPublisher(),
+            pipelineGraphPublisher()
+          ]) {
+            dir (stageId) {
+              if (isUnix()) {
+                sh cmd.join(' ')
+              } else {
+                bat cmd.join(' ')
+              }
+            }
+          }
+        } catch (Throwable e) {
+          // First step to keep the workspace clean and safe disk space
+          cleanWs()
+          if (!taskContext.failFast) {
+            throw e
+          } else if (taskContext.failingFast == null) {
+            taskContext.failingFast = stageId
+            echo "[FAIL FAST] This is the first failure and likely root cause"
+            throw e
+          } else {
+            echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
+          }
+        }
+      }
 	  }
 	}
 }

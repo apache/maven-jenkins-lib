@@ -116,6 +116,8 @@ def call(Map params = [:]) {
                   }
                 }
               } catch (Throwable e) {
+                // First step to keep the workspace clean and safe disk space
+                cleanWs()
                 if (!failFast) {
                   throw e
                 } else if (failingFast == null) {
