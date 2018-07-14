@@ -35,7 +35,9 @@ def call(Map params = [:]) {
     def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['7','8','9','10']
     def maven = params.containsKey('maven') ? params.maven : '3.x.x'
-    def failFast = params.containsKey('failFast') ? params.failFast : true
+    #def failFast = params.containsKey('failFast') ? params.failFast : true
+    # Just temporarily
+    def failFast = false;
     Map tasks = [failFast: failFast]
     boolean first = true
     for (String os in oses) {
