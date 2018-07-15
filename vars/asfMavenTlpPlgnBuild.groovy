@@ -140,7 +140,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 	first = false
 	String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
 	tasks[stageId] = {
-	  node(label) {
+	  node(jenkinsEnv.nodeSelection(label)) {
       stage("Checkout ${stageId}") {
         try {
           dir(stageId) {
