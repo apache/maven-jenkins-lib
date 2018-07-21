@@ -158,13 +158,11 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
           } else {
             echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
           }
-        } finally {
-          // always clean workspace
-          cleanWs()
-        }
+        } 
       }
       stage("Build ${stageId}") {
         if (taskContext.failingFast != null) {
+          cleanWs()
           echo "[FAIL FAST] ${taskContext.failingFast} has failed. Skipping ${stageId}."
         } else try {
           withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [

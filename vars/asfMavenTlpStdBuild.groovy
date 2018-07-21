@@ -95,12 +95,11 @@ def call(Map params = [:]) {
                 } else {
                   echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
                 }
-              } finally {
-                cleanWs()
-              }
+              } 
             }
             stage("Build ${stageId}") {
               if (failingFast != null) {
+                cleanWs()
                 echo "[FAIL FAST] ${failingFast} has failed. Skipping ${stageId}."
               } else try {
                 // mavenSettingsConfig: 'simple-deploy-settings-no-mirror',
