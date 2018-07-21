@@ -95,6 +95,8 @@ def call(Map params = [:]) {
                 } else {
                   echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
                 }
+              } finally {
+                cleanWs()
               }
             }
             stage("Build ${stageId}") {
@@ -132,6 +134,8 @@ def call(Map params = [:]) {
                 } else {
                   echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
                 }
+              } finally {
+                cleanWs()
               }
             }
           }

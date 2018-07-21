@@ -158,6 +158,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
           } else {
             echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
           }
+        } finally {
+          // always clean workspace
+          cleanWs()
         }
       }
       stage("Build ${stageId}") {
@@ -193,6 +196,8 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
           } else {
             echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
           }
+        } finally {
+          cleanWs()
         }
       }
 	  }
