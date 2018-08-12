@@ -178,7 +178,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               if (isUnix()) {
                 sh cmd.join(' ')
               } else {
-                bat cmd.join(' ')
+			    withEnv(['Path=C:\\WINDOWS\\system32;%Path%']) {
+                  bat cmd.join(' ')
+				}
               }
             }
           }
