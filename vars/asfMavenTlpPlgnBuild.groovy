@@ -142,6 +142,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 	tasks[stageId] = {
 	  node(jenkinsEnv.nodeSelection(label)) {
       stage("Checkout ${stageId}") {
+	    echo "PATH: ${env.PATH}"
         try {
           dir(stageId) {
             checkout scm
