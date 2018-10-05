@@ -146,7 +146,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 	  node(jenkinsEnv.nodeSelection(label)) {
 	  
 	  if (os == 'windows' && taskContext.tmpWs) {
-	    ws(pwd(true))
+	    ws(dir:pwd(tmp:true))
 	  }
 	  
       stage("Checkout ${stageId}") {
