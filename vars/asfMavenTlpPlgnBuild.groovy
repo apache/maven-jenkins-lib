@@ -50,13 +50,13 @@ def call(Map params = [:]) {
     boolean first = true
     for (String os in oses) {
       for (def mvn in mavens) {
-	    def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
-		jdks = jdks.findAll{ it != jdk }
-	    doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
+      def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
+    jdks = jdks.findAll{ it != jdk }
+      doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
       }
       for (def jdk in jdks) {
-	    def mvn = jenkinsEnv.mavenForJdk(jdk)
-	    doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
+      def mvn = jenkinsEnv.mavenForJdk(jdk)
+      doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
       }
       
       // doesn't work for multimodules yet
@@ -104,108 +104,108 @@ def call(Map params = [:]) {
 
 def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 {
-	String label = jenkinsEnv.labelForOS(os);
-	String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
-	String mvnName = jenkinsEnv.mvnFromVersion(os, "${maven}")
-	echo "OS: ${os} JDK: ${jdk} Maven: ${maven} => Label: ${label} JDK: ${jdkName} Maven: ${mvnName}"
-	if (label == null || jdkName == null || mvnName == null) {
-	  echo "Skipping ${os}-jdk${jdk} as unsupported by Jenkins Environment"
-	  return;
-	}
-	def cmd = [
-	  'mvn',
-	  '-P+run-its',
-	  '-Dmaven.test.failure.ignore=true',
-	  '-Dfindbugs.failOnError=false',
-	]
-	if (!first) {
-	  cmd += '-Dfindbugs.skip=true'
-	}
-	if (jdk == '7') {
-	  // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
-	  cmd += '-Dhttps.protocols=TLSv1.2'
-	}
+  String label = jenkinsEnv.labelForOS(os);
+  String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
+  String mvnName = jenkinsEnv.mvnFromVersion(os, "${maven}")
+  echo "OS: ${os} JDK: ${jdk} Maven: ${maven} => Label: ${label} JDK: ${jdkName} Maven: ${mvnName}"
+  if (label == null || jdkName == null || mvnName == null) {
+    echo "Skipping ${os}-jdk${jdk} as unsupported by Jenkins Environment"
+    return;
+  }
+  def cmd = [
+    'mvn',
+    '-P+run-its',
+    '-Dmaven.test.failure.ignore=true',
+    '-Dfindbugs.failOnError=false',
+  ]
+  if (!first) {
+    cmd += '-Dfindbugs.skip=true'
+  }
+  if (jdk == '7') {
+    // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
+    cmd += '-Dhttps.protocols=TLSv1.2'
+  }
 
-	if (plan == 'build') {
+  if (plan == 'build') {
       cmd += 'clean'
       cmd += 'verify'
-	}
-	else if (plan == 'site') {
+  }
+  else if (plan == 'site') {
       cmd += 'site'
       cmd += '-Preporting'
-	}
-	else if (plan == 'release') {
+  }
+  else if (plan == 'release') {
       cmd += 'verify'
       cmd += '-Papache-release'
-	}
-	
-	def disablePublishers = !first
-	first = false
-	String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
-	tasks[stageId] = {
-	  node(jenkinsEnv.nodeSelection(label)) {
-	  
-	  if (os == 'windows' && taskContext.tmpWs) {
-	    ws(dir:pwd(tmp:true))
-	  }
-	  
-      stage("Checkout ${stageId}") {
-        try {
-          dir(stageId) {
-            checkout scm
-          }
-        } catch (Throwable e) {
-          // First step to keep the workspace clean and safe disk space
-          cleanWs()
-          if (!taskContext.failFast) {
-            throw e
-          } else if (taskContext.failingFast == null) {
-            taskContext.failingFast = stageId
-            echo "[FAIL FAST] This is the first failure and likely root cause"
-            throw e
-          } else {
-            echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
-          }
-        } 
-      }
-      stage("Build ${stageId}") {
-        if (taskContext.failingFast != null) {
-          cleanWs()
-          echo "[FAIL FAST] ${taskContext.failingFast} has failed. Skipping ${stageId}."
-        } else try {
-          withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
-            artifactsPublisher(disabled: disablePublishers),
-            junitPublisher(ignoreAttachments: false),
-            findbugsPublisher(disabled: disablePublishers),
-            openTasksPublisher(disabled: disablePublishers),
-            dependenciesFingerprintPublisher(),
-            invokerPublisher(),
-            pipelineGraphPublisher()
-          ]) {
-            dir (stageId) {
-              if (isUnix()) {
-                sh cmd.join(' ')
-              } else {
-                bat cmd.join(' ')
+  }
+
+  def disablePublishers = !first
+  first = false
+  String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
+  tasks[stageId] = {
+    node(jenkinsEnv.nodeSelection(label)) {
+      var tmpWs = (os == 'windows' && taskContext.tmpWs)
+      ws(dir:pwd(tmp:tmpWs))
+      {
+        stage("Checkout ${stageId}") {
+          try {
+            dir(stageId) {
+              checkout scm
+            }
+          } catch (Throwable e) {
+            // First step to keep the workspace clean and safe disk space
+            cleanWs()
+
+            if (!taskContext.failFast) {
+              throw e
+            } else if (taskContext.failingFast == null) {
+              taskContext.failingFast = stageId
+              echo "[FAIL FAST] This is the first failure and likely root cause"
+              throw e
+            } else {
+              echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
+            }
+          } 
+        }
+        stage("Build ${stageId}") {
+          if (taskContext.failingFast != null) {
+            cleanWs()
+            echo "[FAIL FAST] ${taskContext.failingFast} has failed. Skipping ${stageId}."
+          } else try {
+            withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
+              artifactsPublisher(disabled: disablePublishers),
+              junitPublisher(ignoreAttachments: false),
+              findbugsPublisher(disabled: disablePublishers),
+              openTasksPublisher(disabled: disablePublishers),
+              dependenciesFingerprintPublisher(),
+              invokerPublisher(),
+              pipelineGraphPublisher()
+           ]) {
+             dir (stageId) {
+               if (isUnix()) {
+                 sh cmd.join(' ')
+               } else {
+                 bat cmd.join(' ')
+                }
               }
             }
-          }
-        } catch (Throwable e) {
-          // First step to keep the workspace clean and safe disk space
-          cleanWs()
-          if (!taskContext.failFast) {
-            throw e
-          } else if (taskContext.failingFast == null) {
-            taskContext.failingFast = stageId
-            echo "[FAIL FAST] This is the first failure and likely root cause"
-            throw e
-          } else {
-            echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
-          }
-        } finally {
-          cleanWs()
+          } catch (Throwable e) {
+            // First step to keep the workspace clean and safe disk space
+            cleanWs()
+            if (!taskContext.failFast) {
+              throw e
+            } else if (taskContext.failingFast == null) {
+              taskContext.failingFast = stageId
+              echo "[FAIL FAST] This is the first failure and likely root cause"
+              throw e
+            } else {
+              echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
+            }
+          } finally {
+            cleanWs()
+          }  
         }
       }
-	  }
-	}
+    }
+  }
 }
