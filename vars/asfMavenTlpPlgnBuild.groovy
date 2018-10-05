@@ -41,8 +41,11 @@ def call(Map params = [:]) {
     def failFast = false;
     def siteJdk = params.containsKey('siteJdk') ? params.siteJdk : '8'
     def siteMvn = params.containsKey('siteMvn') ? params.siteJdk : '3.5.x'
+    def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     
     taskContext['failFast'] = failFast;
+    taskContext['tmpWs'] = tmpWs;
+
     Map tasks = [failFast: failFast]
     boolean first = true
     for (String os in oses) {
@@ -141,8 +144,12 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 	String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
 	tasks[stageId] = {
 	  node(jenkinsEnv.nodeSelection(label)) {
+	  
+	  if (os == 'windows' && taskContext.tmpWs) {
+	    ws(pwd(true))
+	  }
+	  
       stage("Checkout ${stageId}") {
-	    echo "PATH: ${env.PATH}"
         try {
           dir(stageId) {
             checkout scm
