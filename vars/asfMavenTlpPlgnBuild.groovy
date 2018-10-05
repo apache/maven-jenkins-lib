@@ -144,9 +144,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
   tasks[stageId] = {
     node(jenkinsEnv.nodeSelection(label)) {
-      var tmpWs = (os == 'windows' && taskContext.tmpWs)
-      ws(dir:pwd(tmp:tmpWs))
-      {
+//      var tmpWs = (os == 'windows' && taskContext.tmpWs)
+//      ws(dir:pwd(tmp:tmpWs))
+//      {
         stage("Checkout ${stageId}") {
           try {
             dir(stageId) {
@@ -205,7 +205,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
             cleanWs()
           }  
         }
-      }
+//      }
     }
   }
 }
