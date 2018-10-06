@@ -144,8 +144,10 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
   tasks[stageId] = {
     node(jenkinsEnv.nodeSelection(label)) {
-      def tmpWs = (os == 'windows' && taskContext.tmpWs)
-	  def wsDir = pwd( tmp : tmpWs )
+      def wsDir = pwd()
+	  if (os == 'windows' && taskContext.tmpWs) {
+	    wsDir = "$TEMP/$BUILD_TAG"
+	  }
       ws( dir : "$wsDir" )
       {
         stage("Checkout ${stageId}") {
