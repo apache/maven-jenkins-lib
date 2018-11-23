@@ -117,6 +117,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
     '-P+run-its',
     '-Dmaven.test.failure.ignore=true',
     '-Dfindbugs.failOnError=false',
+    '-e',
   ]
   if (!first) {
     cmd += '-Dfindbugs.skip=true'
