@@ -186,7 +186,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               dependenciesFingerprintPublisher(),
               invokerPublisher(),
               pipelineGraphPublisher()
-           ]) {
+           ], publisherStrategy: 'EXPLICIT') {
              dir (stageId) {
                if (isUnix()) {
                  sh cmd.join(' ')
