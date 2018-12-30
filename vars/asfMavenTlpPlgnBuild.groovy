@@ -141,7 +141,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       cmd += 'verify'
       cmd += '-Papache-release'
   }
-
+  def localRepo = "../.maven_repositories/${env.EXECUTOR_NUMBER}" // ".repository" //	
   def disablePublishers = !first
   first = false
   String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
@@ -178,7 +178,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
             cleanWs()
             echo "[FAIL FAST] ${taskContext.failingFast} has failed. Skipping ${stageId}."
           } else try {
-            withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', options: [
+            withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:localRepo, options: [
               artifactsPublisher(disabled: disablePublishers),
               junitPublisher(ignoreAttachments: false),
               findbugsPublisher(disabled: disablePublishers),
