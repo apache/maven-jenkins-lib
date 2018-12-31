@@ -185,7 +185,8 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               openTasksPublisher(disabled: disablePublishers),
               dependenciesFingerprintPublisher(),
               invokerPublisher(),
-              pipelineGraphPublisher()
+              pipelineGraphPublisher(),
+              mavenLinkerPublisher(disabled: false)
            ], publisherStrategy: 'EXPLICIT') {
              dir (stageId) {
                if (isUnix()) {
