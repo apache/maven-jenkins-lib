@@ -198,7 +198,8 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
             }
           } catch (Throwable e) {
             // First step to keep the workspace clean and safe disk space
-            cleanWs()
+// 20180104: Fails because some java process keeps handles on files on Windows
+//            cleanWs()
             if (!taskContext.failFast) {
               throw e
             } else if (taskContext.failingFast == null) {
@@ -209,7 +210,8 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
             }
           } finally {
-            cleanWs()
+// 20180104: Fails because some java process keeps handles on files on Windows
+//            cleanWs()
           }  
         }
       }
