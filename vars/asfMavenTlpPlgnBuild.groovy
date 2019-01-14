@@ -184,7 +184,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               findbugsPublisher(disabled: disablePublishers),
               openTasksPublisher(disabled: disablePublishers),
               dependenciesFingerprintPublisher(),
-//              invokerPublisher(),
+// DISABLED DUE TO INFRA-17514 invokerPublisher(),
               pipelineGraphPublisher(),
               mavenLinkerPublisher(disabled: false)
            ], publisherStrategy: 'EXPLICIT') {
@@ -198,8 +198,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
             }
           } catch (Throwable e) {
             // First step to keep the workspace clean and safe disk space
-// 20180104: Fails because some java process keeps handles on files on Windows
-//            cleanWs()
+            cleanWs()
             if (!taskContext.failFast) {
               throw e
             } else if (taskContext.failingFast == null) {
@@ -210,8 +209,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
             }
           } finally {
-// 20180104: Fails because some java process keeps handles on files on Windows
-//            cleanWs()
+            cleanWs()
           }  
         }
       }

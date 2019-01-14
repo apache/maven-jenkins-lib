@@ -109,7 +109,7 @@ def call(Map params = [:]) {
                             findbugsPublisher(disabled: disablePublishers),
                             openTasksPublisher(disabled: disablePublishers),
                             dependenciesFingerprintPublisher(),
-                            invokerPublisher(),
+// DISABLED DUE TO INFRA-17514 invokerPublisher(),
                             pipelineGraphPublisher()
                           ]) {
                 dir ('m') {
