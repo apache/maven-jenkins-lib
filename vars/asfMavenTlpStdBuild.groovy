@@ -149,6 +149,7 @@ def call(Map params = [:]) {
     if (e.causes.size() == 0) {
       currentBuild.result = "ABORTED"
     } else {
+      echo "FAILURE-002 FlowInterruptedException ${e}"
       currentBuild.result = "FAILURE"
     }
     throw e
@@ -157,6 +158,7 @@ def call(Map params = [:]) {
     if (e.getMessage().contains('script returned exit code 143')) {
       currentBuild.result = "ABORTED"
     } else {
+      echo "FAILURE-003 AbortException ${e}"
       currentBuild.result = "FAILURE"
     }
     throw e
@@ -164,6 +166,7 @@ def call(Map params = [:]) {
     currentBuild.result = "ABORTED"
     throw e
   } catch (Throwable e) {
+    echo "FAILURE-001 ${e}"
     currentBuild.result = "FAILURE"
     throw e
   } finally {
