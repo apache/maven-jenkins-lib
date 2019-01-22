@@ -121,6 +121,8 @@ def call(Map params = [:]) {
                   }
                 }
               } catch (Throwable e) {
+                echo "[FAILURE-004] ${e}"
+                echo currentBuild.rawBuild.getCauses()
                 // First step to keep the workspace clean and safe disk space
                 cleanWs()
                 if (!failFast) {
@@ -149,8 +151,8 @@ def call(Map params = [:]) {
     if (e.causes.size() == 0) {
       currentBuild.result = "ABORTED"
     } else {
-      echo "FAILURE-002 FlowInterruptedException ${e}"
       currentBuild.result = "FAILURE"
+      echo "[FAILURE-002] FlowInterruptedException ${e}"
     }
     throw e
   } catch (hudson.AbortException e) {
@@ -158,16 +160,17 @@ def call(Map params = [:]) {
     if (e.getMessage().contains('script returned exit code 143')) {
       currentBuild.result = "ABORTED"
     } else {
-      echo "FAILURE-003 AbortException ${e}"
       currentBuild.result = "FAILURE"
+      echo "[FAILURE-003] AbortException ${e}"
     }
     throw e
   } catch (InterruptedException e) {
     currentBuild.result = "ABORTED"
     throw e
   } catch (Throwable e) {
-    echo "FAILURE-001 ${e}"
     currentBuild.result = "FAILURE"
+    echo "[FAILURE-001] ${e}"
+    echo currentBuild.rawBuild.getCauses()
     throw e
   } finally {
     // notify completion
