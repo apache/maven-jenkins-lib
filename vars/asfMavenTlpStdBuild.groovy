@@ -170,7 +170,6 @@ def call(Map params = [:]) {
   } catch (Throwable e) {
     currentBuild.result = "FAILURE"
     echo "[FAILURE-001] ${e}"
-    echo currentBuild.rawBuild.getCauses()
     throw e
   } finally {
     // notify completion
