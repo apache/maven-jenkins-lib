@@ -184,7 +184,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               findbugsPublisher(disabled: disablePublishers),
               openTasksPublisher(disabled: disablePublishers),
               dependenciesFingerprintPublisher(),
-// DISABLED DUE TO INFRA-17514 invokerPublisher(),
+              invokerPublisher(),
               pipelineGraphPublisher(),
               mavenLinkerPublisher(disabled: false)
            ], publisherStrategy: 'EXPLICIT') {
