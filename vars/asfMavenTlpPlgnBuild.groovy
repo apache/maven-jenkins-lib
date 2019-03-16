@@ -149,7 +149,8 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
     node(jenkinsEnv.nodeSelection(label)) {
       def wsDir = pwd()
 	  if (os == 'windows' && taskContext.tmpWs) {
-	    wsDir = "$TEMP\\$BUILD_TAG" // or use F:\jenkins\jenkins-slave\workspace or F:\short
+//	    wsDir = "$TEMP\\$BUILD_TAG" // or use F:\jenkins\jenkins-slave\workspace or F:\short
+	    wsDir = "F:\\short\\$BUILD_TAG"
 	  }
       ws( dir : "$wsDir" )
       {
