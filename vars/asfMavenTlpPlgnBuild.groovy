@@ -148,15 +148,17 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   tasks[stageId] = {
     node(jenkinsEnv.nodeSelection(label)) {
       def wsDir = pwd()
+	  def stageDir = stageId
 	  if (os == 'windows' && taskContext.tmpWs) {
 //	    wsDir = "$TEMP\\$BUILD_TAG" // or use F:\jenkins\jenkins-slave\workspace or F:\short
 	    wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)maven-(.+)-plugin(.*)/) { "${it[1]}m-${it[2]}-p${it[3]}" }
+		stageDir = "j${jdk}m${maven}${plan}"
 	  }
       ws( dir : "$wsDir" )
       {
         stage("Checkout ${stageId}") {
           try {
-            dir(stageId) {
+            dir(stageDir) {
               checkout scm
             }
           } catch (Throwable e) {
@@ -189,7 +191,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               pipelineGraphPublisher(),
               mavenLinkerPublisher(disabled: false)
            ], publisherStrategy: 'EXPLICIT') {
-             dir (stageId) {
+             dir (stageDir) {
                if (isUnix()) {
                  sh cmd.join(' ')
                } else {
