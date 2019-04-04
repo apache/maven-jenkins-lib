@@ -156,7 +156,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       {
         stage("Checkout ${stageId}") {
           try {
-            dir(stageId - 'windows-') {
+            dir(stageId) {
               checkout scm
             }
           } catch (Throwable e) {
