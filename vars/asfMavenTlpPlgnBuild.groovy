@@ -150,13 +150,13 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       def wsDir = pwd()
 	  if (os == 'windows' && taskContext.tmpWs) {
 //	    wsDir = "$TEMP\\$BUILD_TAG" // or use F:\jenkins\jenkins-slave\workspace or F:\short
-	    wsDir = "F:\\short\\$BUILD_TAG"
+	    wsDir = "F:\\short\\$BUILD_TAG".replaceAll(/(.+)maven-(.+)-plugin(.*)/) { txt, l, m, r -> l + 'm-' + m + '-p' + r } )
 	  }
       ws( dir : "$wsDir" )
       {
         stage("Checkout ${stageId}") {
           try {
-            dir(stageId) {
+            dir(stageId - 'windows-') {
               checkout scm
             }
           } catch (Throwable e) {
