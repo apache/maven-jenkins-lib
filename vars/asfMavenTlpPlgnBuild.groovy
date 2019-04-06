@@ -151,8 +151,8 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 	  def stageDir = stageId
 	  if (os == 'windows' && taskContext.tmpWs) {
 //	    wsDir = "$TEMP\\$BUILD_TAG" // or use F:\jenkins\jenkins-slave\workspace or F:\short
-	    wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)maven-(.+)-plugin(.*)/) { "${it[1]}m-${it[2]}-p${it[3]}" }
-		stageDir = "j${jdk}m${maven}${plan}"
+	    wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)maven-(.+)-plugin(.*)/) { "m-${it[2]}-p${it[3]}" }
+		stageDir = "j${jdk}m${maven}" + plan.take(1)
 	  }
       ws( dir : "$wsDir" )
       {
