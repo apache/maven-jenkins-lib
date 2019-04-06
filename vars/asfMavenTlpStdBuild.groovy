@@ -135,7 +135,11 @@ def call(Map params = [:]) {
                   echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
                 }
               } finally {
-                cleanWs()
+			    try {
+                  cleanWs()
+				} catch(IOException e) {
+				  echo "Failed to clean up workspace: ${e}"
+				}
               }
             }
           }
