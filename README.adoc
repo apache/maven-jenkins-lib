@@ -1,6 +1,6 @@
 == Apache Maven Jenkins Shared Libraries
 
-This repository contains the Jenkins shared libraries that define the standard build process for Apache Maven subporjects.
+This repository contains the Jenkins shared libraries that define the standard build process for Apache Maven subprojects.
 
 The shared libraries rely on a definition of the per-Jenkins instance specific configuration details.
 The definition of those instance specific configuration details as customized for the Apache build server is hosted in https://gitbox.apache.org/repos/asf?p=maven-jenkins-env.git[maven-jenkins-env]
