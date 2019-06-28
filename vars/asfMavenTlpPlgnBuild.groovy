@@ -36,7 +36,7 @@ def call(Map params = [:]) {
 	// minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['7','8','11','12','13']
     def jdkMin = jdks[0];
-    def mavens = params.containsKey('maven') ? params.maven : ['3.2.x','3.3.x','3.5.x']
+    def mavens = params.containsKey('maven') ? params.maven : ['3.2.x','3.3.x','3.5.x','3.6.x']
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
@@ -133,7 +133,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   if (plan == 'build') {
       cmd += 'clean'
       cmd += 'verify'
-      if (env.BRANCH_NAME == 'master' && jdk == '8' && maven == '3.5.x') {
+      if (env.BRANCH_NAME == 'master' && jdk == '8' && maven == '3.5.x' && os == 'linux' ) {
         cmd += 'deploy'		      
       } 	      
   }
