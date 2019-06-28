@@ -66,13 +66,11 @@ def call(Map params = [:]) {
         }
         cmd += 'clean'
         def branchName = "${env.BRANCH_NAME}"
-        //if(branchName == "master") {
-        //  cmd += 'deploy'
-        //  cmd += "-DdeployAtEnd=true"
-        //} else {
-        //  cmd += 'verify'
-        cmd += 'verify'
-        //} 
+	if (branchName == 'master' && jdk == '8' && maven == '3.6.x' && os == 'linux' ) {
+          cmd += 'deploy'
+        } else {
+          cmd += 'verify'
+        } 
         def disablePublishers = !first
         first = false
         String stageId = "${os}-jdk${jdk}"
