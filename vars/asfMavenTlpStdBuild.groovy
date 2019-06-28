@@ -66,7 +66,7 @@ def call(Map params = [:]) {
         }
         cmd += 'clean'
         def branchName = "${env.BRANCH_NAME}"
-	if (branchName == 'master' && jdk == '8' && maven == '3.x.x' && os == 'linux' ) {
+	if (branchName == 'master' && jdk == '8' && os == 'linux' ) {
           cmd += 'deploy'
         } else {
           cmd += 'verify'
