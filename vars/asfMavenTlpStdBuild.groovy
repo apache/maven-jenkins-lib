@@ -66,7 +66,7 @@ def call(Map params = [:]) {
         }
         cmd += 'clean'
         def branchName = "${env.BRANCH_NAME}"
-	if (branchName == 'master' && jdk == '8' && maven == '3.6.x' && os == 'linux' ) {
+	if (branchName == 'master' && jdk == '8' && maven == '3.x.x' && os == 'linux' ) {
           cmd += 'deploy'
         } else {
           cmd += 'verify'
@@ -133,11 +133,11 @@ def call(Map params = [:]) {
                   echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
                 }
               } finally {
-			    try {
+                try {
                   cleanWs()
-				} catch(IOException e) {
-				  echo "Failed to clean up workspace: ${e}"
-				}
+		} catch(IOException e) {
+		  echo "Failed to clean up workspace: ${e}"
+		}
               }
             }
           }
