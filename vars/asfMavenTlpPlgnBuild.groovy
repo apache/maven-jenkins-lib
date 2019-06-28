@@ -132,10 +132,11 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 
   if (plan == 'build') {
       cmd += 'clean'
-      cmd += 'verify'
       if (env.BRANCH_NAME == 'master' && jdk == '8' && maven == '3.6.x' && os == 'linux' ) {
         cmd += 'deploy'		      
-      } 	      
+      } else {
+	cmd += 'verify'      
+      }	      
   }
   else if (plan == 'site') {
       cmd += 'site'
