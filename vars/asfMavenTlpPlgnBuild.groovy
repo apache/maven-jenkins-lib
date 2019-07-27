@@ -46,6 +46,7 @@ def call(Map params = [:]) {
     
     taskContext['failFast'] = failFast;
     taskContext['tmpWs'] = tmpWs;
+    taskContext['archives'] = params.archives
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -205,6 +206,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               }
             }
           } catch (Throwable e) {
+            archiveDirs(taskContext.archives)
             // First step to keep the workspace clean and safe disk space
             cleanWs()
             if (!taskContext.failFast) {
@@ -221,6 +223,14 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
           }  
         }
       }
+    }
+  }
+}
+
+def archiveDirs(archives) {
+  if (archives != null) {
+    archives.each { archiveFileName, pathToContent ->
+	  zip(zipFile: "${archiveFileName}.zip", dir: pathToContent, archive: true)
     }
   }
 }
