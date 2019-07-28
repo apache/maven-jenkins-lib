@@ -206,7 +206,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               }
             }
           } catch (Throwable e) {
-            archiveDirs(taskContext.archives)
+            archiveDirs(taskContext.archives, stageDir)
             // First step to keep the workspace clean and safe disk space
             cleanWs()
             if (!taskContext.failFast) {
@@ -227,10 +227,12 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   }
 }
 
-def archiveDirs(archives) {
+def archiveDirs(archives, stageDir) {
   if (archives != null) {
-    archives.each { archiveFileName, pathToContent ->
-	  zip(zipFile: "${archiveFileName}.zip", dir: pathToContent, archive: true)
-    }
+    dir(stageDir) {
+      archives.each { archivePrefix, pathToContent ->
+	    zip(zipFile: "${archivePrefix}-${stageDir}.zip", dir: pathToContent, archive: true)
+      }
+	}
   }
 }
