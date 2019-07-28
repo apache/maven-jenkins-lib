@@ -199,7 +199,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
            ], publisherStrategy: 'EXPLICIT') {
              dir (stageDir) {
                if (isUnix()) {
-                 sh 'df -h -t --output=source,used,avail,size,pcent'
+                 sh 'df -hT'
                  sh cmd.join(' ')
                } else {
                  bat 'wmic logicaldisk get size,freespace,caption'
