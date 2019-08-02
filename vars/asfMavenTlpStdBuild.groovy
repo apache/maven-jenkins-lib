@@ -180,7 +180,7 @@ def call(Map params = [:]) {
     }
     stage("Notifications") {
 	  def changes = currentBuild?.changeSets
-	  def authors = !changes || changes.isEmpty() ? [] : currentBuild.changeSets.last().toList().collect { it.author.toString() }.unique()
+	  def authors = !changes || changes.isEmpty() ? [] : changes.last().toList().collect { it.author.toString() }.unique()
 	  println("The author of the last change: ${authors}")
 	  if (!changes || !authors.contains('github')) jenkinsNotify()
     }
