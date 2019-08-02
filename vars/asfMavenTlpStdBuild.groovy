@@ -179,7 +179,10 @@ def call(Map params = [:]) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${failingFast}\n\n***** FAST FAILURE *****"
     }
     stage("Notifications") {
-      jenkinsNotify()
+      def isFirstBuild = currentBuild == null || currentBuild.changeSets == null
+	  def authors = isFirstBuild ? [] : currentBuild.changeSets.last().toList().collect { it.author.toString() }.unique()
+	  println("The author of the last change: ${authors}")
+	  if (isFirstBuild || !authors.contains('github')) jenkinsNotify()
     }
   }
 }
