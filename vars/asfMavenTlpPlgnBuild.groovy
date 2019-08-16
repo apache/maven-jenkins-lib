@@ -147,10 +147,11 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       cmd += 'verify'
       cmd += '-Papache-release'
   }
-  def localRepo = "../.maven_repositories/${env.EXECUTOR_NUMBER}" // ".repository" //	
+  def localRepo = "../.maven_repositories/${EXECUTOR_NUMBER}" // ".repository" //
   def disablePublishers = !first
   first = false
   String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
+  println "Local Repo (${stageId}): ${localRepo}"
   tasks[stageId] = {
     node(jenkinsEnv.nodeSelection(label)) {
       def wsDir = pwd()
