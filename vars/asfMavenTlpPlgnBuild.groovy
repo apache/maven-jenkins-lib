@@ -147,11 +147,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       cmd += 'verify'
       cmd += '-Papache-release'
   }
-  def localRepo = "../.maven_repositories/${env.EXECUTOR_NUMBER}" // ".repository" //
   def disablePublishers = !first
   first = false
   String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
-  println "Local Repo (${stageId}): ${localRepo}"
   tasks[stageId] = {
     node(jenkinsEnv.nodeSelection(label)) {
       def wsDir = pwd()
@@ -188,6 +186,8 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
             cleanWs()
             echo "[FAIL FAST] ${taskContext.failingFast} has failed. Skipping ${stageId}."
           } else try {
+            def localRepo = "../.maven_repositories/${env.EXECUTOR_NUMBER}"
+            println "Local Repo (${stageId}): ${localRepo}"
             withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:localRepo, options: [
               artifactsPublisher(disabled: disablePublishers),
               junitPublisher(ignoreAttachments: false),
