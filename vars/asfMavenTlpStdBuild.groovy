@@ -65,8 +65,7 @@ def call(Map params = [:]) {
           cmd += '-Dhttps.protocols=TLSv1.2'
         }
         cmd += 'clean'
-        def branchName = "${env.BRANCH_NAME}"
-	if (branchName == 'master' && jdk == '8' && os == 'linux' ) {
+        if (env.BRANCH_NAME == 'master' && jdk == '8' && os == 'linux' ) {
           cmd += 'deploy'
         } else {
           cmd += 'verify'
