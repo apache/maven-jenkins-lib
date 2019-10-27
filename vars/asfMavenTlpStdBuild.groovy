@@ -76,6 +76,7 @@ def call(Map params = [:]) {
         tasks[stageId] = {
           node("${label}") {
             stage("Checkout ${stageId}") {
+              echo "NODE_NAME = ${env.NODE_NAME}"
               try {
                 dir('m') {
                   checkout scm

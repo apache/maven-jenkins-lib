@@ -162,6 +162,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       ws( dir : "$wsDir" )
       {
         stage("Checkout ${stageId}") {
+          echo "NODE_NAME = ${env.NODE_NAME}"
           try {
             dir(stageDir) {
               checkout scm
