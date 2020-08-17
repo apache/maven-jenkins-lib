@@ -195,9 +195,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               junitPublisher(ignoreAttachments: false),
               findbugsPublisher(disabled: disablePublishers),
               openTasksPublisher(disabled: disablePublishers),
-              dependenciesFingerprintPublisher(),
+              dependenciesFingerprintPublisher(disabled: disablePublishers),
               invokerPublisher(),
-              pipelineGraphPublisher(),
+              pipelineGraphPublisher(disabled: disablePublishers),
               mavenLinkerPublisher(disabled: false)
            ], publisherStrategy: 'EXPLICIT') {
              dir (stageDir) {
