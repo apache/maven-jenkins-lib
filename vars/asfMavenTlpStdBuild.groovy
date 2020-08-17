@@ -107,10 +107,10 @@ def call(Map params = [:]) {
                             junitPublisher(ignoreAttachments: false),
                             findbugsPublisher(disabled: disablePublishers),
                             openTasksPublisher(disabled: disablePublishers),
-                            dependenciesFingerprintPublisher(),
+                            dependenciesFingerprintPublisher(disabled: disablePublishers),
 // DISABLED DUE TO INFRA-17514 invokerPublisher(),
-                            pipelineGraphPublisher()
-                          ]) {
+                            pipelineGraphPublisher(disabled: disablePublishers)
+                          ], publisherStrategy: 'EXPLICIT') {
                 dir ('m') {
                     if (isUnix()) {
                       sh cmd.join(' ')
