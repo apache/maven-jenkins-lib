@@ -33,7 +33,7 @@ def call(Map params = [:]) {
 
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
-	// minimum, LTS, current and next ea
+    // minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['7','8','11'] //['7','8','11','14','15']
     def maven = params.containsKey('maven') ? params.maven : '3.x.x'
     // def failFast = params.containsKey('failFast') ? params.failFast : true
@@ -135,9 +135,9 @@ def call(Map params = [:]) {
               } finally {
                 try {
                   cleanWs()
-		} catch(IOException e) {
-		  echo "Failed to clean up workspace: ${e}"
-		}
+                } catch(IOException e) {
+                  echo "Failed to clean up workspace: ${e}"
+                }
               }
             }
           }
@@ -179,7 +179,7 @@ def call(Map params = [:]) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${failingFast}\n\n***** FAST FAILURE *****"
     }
     stage("Notifications") {
-	  jenkinsNotify()
+      jenkinsNotify()
     }
   }
 }
