@@ -77,7 +77,7 @@ def call(Map params = [:]) {
         tasks[stageId] = {
           node("${label}") {
             def wsDir = pwd()
-            if (os == 'windows' && taskContext.tmpWs) {
+            if (os == 'windows' && tmpWs) {
               wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)maven-box_maven-(.+)/) { "m-${it[2]}" }
             }
             ws( dir : "$wsDir" )
