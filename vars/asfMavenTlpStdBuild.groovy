@@ -150,8 +150,8 @@ def call(Map params = [:]) {
           }
         }
       }
-    }
-    // run the parallel builds
+
+          // run the parallel builds
     parallel(tasks)
 
     // JENKINS-34376 seems to make it hard to detect the aborted builds
