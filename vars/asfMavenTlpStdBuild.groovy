@@ -76,7 +76,7 @@ def call(Map params = [:]) {
         String stageId = "${os}-jdk${jdk}"
         tasks[stageId] = {
           node("${label}") {
-            def wsDir = pwd()
+            def wsDir = env.WORKSPACE
             if (os == 'windows' && tmpWs) {
               wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)_maven-box_maven-(.+)/) { "m-${it[2]}" }
             }
