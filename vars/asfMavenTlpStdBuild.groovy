@@ -80,7 +80,7 @@ def call(Map params = [:]) {
             withEnv(["NODE_WORKSPACE=${pwd()}"]) {
               def wsDir = env.NODE_WORKSPACE
               if (!isUnix() && tmpWs) {
-                wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)_maven-box_maven-(.+)/) { "m-${it[2]}" }
+                wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)-maven-box-maven-(.+)/) { "m-${it[2]}" }
               }
               ws( dir : "$wsDir" ) {
                 stage("Checkout ${stageId}") {
