@@ -79,7 +79,7 @@ def call(Map params = [:]) {
             // without this block $WORKSPACE could not work as expected in parallel tasks (https://issues.jenkins-ci.org/plugins/servlet/mobile#issue/JENKINS-33511)
             withEnv(["NODE_WORKSPACE=${pwd()}"]) {
               def wsDir = env.NODE_WORKSPACE
-              if (os == 'windows' && tmpWs) {
+              if (!isUnix() && tmpWs) {
                 wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)_maven-box_maven-(.+)/) { "m-${it[2]}" }
               }
               ws( dir : "$wsDir" ) {
