@@ -76,73 +76,76 @@ def call(Map params = [:]) {
         String stageId = "${os}-jdk${jdk}"
         tasks[stageId] = {
           node("${label}") {
-            def wsDir = $WORKSPACE // env.WORKSPACE could not work as expected in parallel tasks (https://issues.jenkins-ci.org/plugins/servlet/mobile#issue/JENKINS-33511)
-            if (os == 'windows' && tmpWs) {
-              wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)_maven-box_maven-(.+)/) { "m-${it[2]}" }
-            }
-            ws( dir : "$wsDir" ) {
-              stage("Checkout ${stageId}") {
-                echo "NODE_NAME = ${env.NODE_NAME}"
-                try {
-                  dir('m') {
-                    checkout scm
-                  }
-                } catch (Throwable e) {
-                  // First step to keep the workspace clean and safe disk space
-                  cleanWs()
-                  if (!failFast) {
-                    throw e
-                  } else if (failingFast == null) {
-                    failingFast = stageId
-                    echo "[FAIL FAST] This is the first failure and likely root cause"
-                    throw e
-                  } else {
-                    echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
-                  }
-                } 
+            // without this block $WORKSPACE could not work as expected in parallel tasks (https://issues.jenkins-ci.org/plugins/servlet/mobile#issue/JENKINS-33511)
+            withEnv(["WORKSPACE=${pwd()}"]) {
+              def wsDir = $WORKSPACE
+              if (os == 'windows' && tmpWs) {
+                wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)_maven-box_maven-(.+)/) { "m-${it[2]}" }
               }
-              stage("Build ${stageId}") {
-                if (failingFast != null) {
-                  cleanWs()
-                  echo "[FAIL FAST] ${failingFast} has failed. Skipping ${stageId}."
-                } else try {
-                  // mavenSettingsConfig: 'simple-deploy-settings-no-mirror',
-                  withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository', 
-                            options: [
-                              artifactsPublisher(disabled: disablePublishers),
-                              junitPublisher(ignoreAttachments: false),
-                              findbugsPublisher(disabled: disablePublishers),
-                              openTasksPublisher(disabled: disablePublishers),
-                              dependenciesFingerprintPublisher(disabled: disablePublishers),
-    // DISAED DUE TO INFRA-17514 invokerPublisher(),
-                              pipelineGraphPublisher(disabled: disablePublishers)
-                            ], publisherStrategy: 'EXPLICIT') {
-                  dir ('m') {
-                      if (isUnix()) {
-                        sh cmd.join(' ')
-                      } else {
-                        bat cmd.join(' ')
-                      }
+              ws( dir : "$wsDir" ) {
+                stage("Checkout ${stageId}") {
+                  echo "NODE_NAME = ${env.NODE_NAME}"
+                  try {
+                    dir('m') {
+                      checkout scm
+                    }
+                  } catch (Throwable e) {
+                    // First step to keep the workspace clean and safe disk space
+                    cleanWs()
+                    if (!failFast) {
+                      throw e
+                    } else if (failingFast == null) {
+                      failingFast = stageId
+                      echo "[FAIL FAST] This is the first failure and likely root cause"
+                      throw e
+                    } else {
+                      echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
                     }
                   }
-                } catch (Throwable e) {
-                  echo "[FAILURE-004] ${e}"
-                  // First step to keep the workspace clean and safe disk space
-                  cleanWs()
-                  if (!failFast) {
-                    throw e
-                  } else if (failingFast == null) {
-                    failingFast = stageId
-                    echo "[FAIL FAST] This is the first failure and likely root cause"
-                    throw e
-                  } else {
-                    echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
-                  }
-                } finally {
-                  try {
+                }
+                stage("Build ${stageId}") {
+                  if (failingFast != null) {
                     cleanWs()
-                  } catch(IOException e) {
-                    echo "Failed to clean up workspace: ${e}"
+                    echo "[FAIL FAST] ${failingFast} has failed. Skipping ${stageId}."
+                  } else try {
+                    // mavenSettingsConfig: 'simple-deploy-settings-no-mirror',
+                    withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:'.repository',
+                              options: [
+                                artifactsPublisher(disabled: disablePublishers),
+                                junitPublisher(ignoreAttachments: false),
+                                findbugsPublisher(disabled: disablePublishers),
+                                openTasksPublisher(disabled: disablePublishers),
+                                dependenciesFingerprintPublisher(disabled: disablePublishers),
+    // DISABLED DUE TO INFRA-17514 invokerPublisher(),
+                                pipelineGraphPublisher(disabled: disablePublishers)
+                              ], publisherStrategy: 'EXPLICIT') {
+                    dir ('m') {
+                        if (isUnix()) {
+                          sh cmd.join(' ')
+                        } else {
+                          bat cmd.join(' ')
+                        }
+                      }
+                    }
+                  } catch (Throwable e) {
+                    echo "[FAILURE-004] ${e}"
+                    // First step to keep the workspace clean and safe disk space
+                    cleanWs()
+                    if (!failFast) {
+                      throw e
+                    } else if (failingFast == null) {
+                      failingFast = stageId
+                      echo "[FAIL FAST] This is the first failure and likely root cause"
+                      throw e
+                    } else {
+                      echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
+                    }
+                  } finally {
+                    try {
+                      cleanWs()
+                    } catch(IOException e) {
+                      echo "Failed to clean up workspace: ${e}"
+                    }
                   }
                 }
               }
