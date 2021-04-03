@@ -34,7 +34,7 @@ def call(Map params = [:]) {
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
     // minimum, LTS, current and next ea
-    def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['7','8','11','15','16']
+    def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['7','8','11','16']
     def maven = params.containsKey('maven') ? params.maven : '3.x.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     // def failFast = params.containsKey('failFast') ? params.failFast : true
