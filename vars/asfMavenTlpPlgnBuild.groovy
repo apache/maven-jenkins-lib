@@ -22,14 +22,16 @@
 def call(Map params = [:]) {
   Map taskContext = [:]
   try {
-    // set build retention time first
-    def buildRetention
+    def buildProperties = []
     if (env.BRANCH_NAME == 'master') {
-      buildRetention = buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '15', numToKeepStr: '10'))
+      // set build retention time first
+      buildProperties.add(buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '15', numToKeepStr: '10')))
+      // ensure a build is done every month
+      buildProperties.add(pipelineTriggers([cron('@monthly')]))
     } else {
-      buildRetention = buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '2', daysToKeepStr: '7', numToKeepStr: '3'))
+      buildProperties.add(buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '2', daysToKeepStr: '7', numToKeepStr: '3')))
     }
-    properties([buildRetention])
+    properties(buildProperties)
 
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
