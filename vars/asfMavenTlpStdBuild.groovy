@@ -36,7 +36,7 @@ def call(Map params = [:]) {
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
     // minimum, LTS, current and next ea
-    def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['7','8','11','16']
+    def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','16','17']
     def maven = params.containsKey('maven') ? params.maven : '3.x.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     // def failFast = params.containsKey('failFast') ? params.failFast : true
@@ -62,10 +62,6 @@ def call(Map params = [:]) {
         ]
         if (!first) {
           cmd += '-Dfindbugs.skip=true'
-        }
-        if (jdk == '7') {
-          // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
-          cmd += '-Dhttps.protocols=TLSv1.2'
         }
         cmd += 'clean'
         if (env.BRANCH_NAME == 'master' && jdk == '8' && os == 'linux' ) {

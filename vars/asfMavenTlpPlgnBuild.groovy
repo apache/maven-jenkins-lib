@@ -36,7 +36,7 @@ def call(Map params = [:]) {
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
 	// minimum, LTS, current and next ea
-    def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['7','8','11','16']
+    def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','16','17']
     def jdkMin = jdks[0];
     def mavens = params.containsKey('maven') ? params.maven : ['3.2.x','3.3.x','3.5.x','3.6.x']
     // def failFast = params.containsKey('failFast') ? params.failFast : true
@@ -127,10 +127,6 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
     cmd += '-Dfindbugs.skip=true'
 //  } else { // Requires authorization on SonarQube first
 //    cmd += 'sonar:sonar'
-  }
-  if (jdk == '7') {
-    // Java 7u80 has TLS 1.2 disabled by default: need to explicitely enable
-    cmd += '-Dhttps.protocols=TLSv1.2'
   }
 
   if (plan == 'build') {
