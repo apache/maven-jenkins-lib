@@ -67,7 +67,7 @@ def call(Map params = [:]) {
         if (env.BRANCH_NAME == 'master' && jdk == '8' && os == 'linux' ) {
           cmd += 'deploy'
         } else {
-          cmd += 'verify'
+          cmd += 'verify -Dpgpverify.skip'
         } 
         def disablePublishers = !first
         first = false

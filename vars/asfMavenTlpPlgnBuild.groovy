@@ -134,7 +134,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       if (env.BRANCH_NAME == 'master' && jdk == '8' && maven == '3.6.x' && os == 'linux' ) {
         cmd += 'deploy'		      
       } else {
-	cmd += 'verify'      
+        cmd += 'verify -Dpgpverify.skip'      
       }	      
   }
   else if (plan == 'site') {
