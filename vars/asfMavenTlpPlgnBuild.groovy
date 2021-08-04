@@ -35,7 +35,7 @@ def call(Map params = [:]) {
 
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux', 'windows']
-    // minimum, LTS, current and next ea
+	// minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','16','17']
     def jdkMin = jdks[0];
     def mavens = params.containsKey('maven') ? params.maven : ['3.2.x','3.3.x','3.5.x','3.6.x']
@@ -49,7 +49,6 @@ def call(Map params = [:]) {
     taskContext['failFast'] = failFast;
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
-    taskContext['mvnOpts'] = params.mvnOpts
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -188,7 +187,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
           } else try {
             def localRepo = "../.maven_repositories/${env.EXECUTOR_NUMBER}"
             println "Local Repo (${stageId}): ${localRepo}"
-            withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:localRepo, mavenOpts:"${taskContext.mvnOpts}", options: [
+            withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:localRepo, options: [
               artifactsPublisher(disabled: disablePublishers),
               junitPublisher(ignoreAttachments: false),
               findbugsPublisher(disabled: disablePublishers),
@@ -200,10 +199,10 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
            ], publisherStrategy: 'EXPLICIT') {
              dir (stageDir) {
                if (isUnix()) {
-//                 sh 'df -hT'
+                 sh 'df -hT'
                  sh cmd.join(' ')
                } else {
-//                 bat 'wmic logicaldisk get size,freespace,caption'
+                 bat 'wmic logicaldisk get size,freespace,caption'
                  bat cmd.join(' ')
                 }
               }
