@@ -64,7 +64,7 @@ def call(Map params = [:]) {
       }
       
       // doesn't work for multimodules yet
-      // doCreateTask( os, siteJdk, siteMvn, tasks, first, 'site', taskContext )
+      doCreateTask( os, siteJdk, siteMvn, tasks, first, 'site', taskContext )
       
       // run with apache-release profile, consider it a dryRun with SNAPSHOTs
       // doCreateTask( os, siteJdk, siteMvn, tasks, first, 'release', taskContext )
