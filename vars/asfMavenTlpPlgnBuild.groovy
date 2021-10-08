@@ -43,7 +43,7 @@ def call(Map params = [:]) {
     // Just temporarily
     def failFast = false;
     def siteJdk = params.containsKey('siteJdk') ? params.siteJdk : '8'
-    def siteMvn = params.containsKey('siteMvn') ? params.siteJdk : '3.5.x'
+    def siteMvn = params.containsKey('siteMvn') ? params.siteJdk : '3.6.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     
     taskContext['failFast'] = failFast;
