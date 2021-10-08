@@ -49,6 +49,7 @@ def call(Map params = [:]) {
     taskContext['failFast'] = failFast;
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
+    taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -138,6 +139,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       }	      
   }
   else if (plan == 'site') {
+      if (taskContext.siteWithPackage) {
+        cmd += 'package'
+      }
       cmd += 'site'
       cmd += '-Preporting'
   }
