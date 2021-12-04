@@ -57,7 +57,7 @@ def call(Map params = [:]) {
         def cmd = [
           'mvn',
           '-P+run-its',
-          '-Dmaven.test.failure.ignore=true',
+//          '-Dmaven.test.failure.ignore=true',
           '-Dfindbugs.failOnError=false',
         ]
         if (!first) {
