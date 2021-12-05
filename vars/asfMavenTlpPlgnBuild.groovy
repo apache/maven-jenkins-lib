@@ -120,7 +120,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   def cmd = [
     'mvn',
     '-P+run-its',
-    '-Dmaven.test.failure.ignore=true',
+    '-Dmaven.test.failure.ignore=false',
     '-Dfindbugs.failOnError=false',
     '-e',
   ]
