@@ -42,7 +42,7 @@ def call(Map params = [:]) {
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
-    def siteJdk = params.containsKey('siteJdk') ? params.siteJdk : '8'
+    def siteJdk = params.containsKey('siteJdk') ? params.siteJdk : '17'
     def siteMvn = params.containsKey('siteMvn') ? params.siteJdk : '3.6.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     
@@ -132,7 +132,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 
   if (plan == 'build') {
       cmd += 'clean'
-      if (env.BRANCH_NAME == 'master' && jdk == '8' && maven == '3.6.x' && os == 'linux' ) {
+      if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.6.x' && os == 'linux' ) {
         cmd += 'deploy'		      
       } else {
         cmd += 'verify -Dpgpverify.skip'      

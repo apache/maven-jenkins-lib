@@ -64,7 +64,7 @@ def call(Map params = [:]) {
           cmd += '-Dfindbugs.skip=true'
         }
         cmd += 'clean'
-        if (env.BRANCH_NAME == 'master' && jdk == '8' && os == 'linux' ) {
+        if (env.BRANCH_NAME == 'master' && jdk == '17' && os == 'linux' ) {
           cmd += 'deploy'
         } else {
           cmd += 'verify -Dpgpverify.skip'
