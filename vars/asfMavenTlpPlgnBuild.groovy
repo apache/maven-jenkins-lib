@@ -38,12 +38,12 @@ def call(Map params = [:]) {
 	// minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['17','11','8']
     def jdkMin = jdks[0];
-    def mavens = params.containsKey('maven') ? params.maven : ['3.2.x','3.3.x','3.5.x','3.6.x','3.8.x']
+    def mavens = params.containsKey('maven') ? params.maven : ['3.2.x','3.3.x','3.5.x','3.6.x']
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
     def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['8','17']
-    def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
+    def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.6.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     
     taskContext['failFast'] = failFast;
