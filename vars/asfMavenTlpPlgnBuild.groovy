@@ -42,8 +42,8 @@ def call(Map params = [:]) {
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
-    def siteJdk = params.containsKey('siteJdk') ? params.siteJdk : '17'
-    def siteMvn = params.containsKey('siteMvn') ? params.siteJdk : '3.6.x'
+    def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['8','17']
+    def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.6.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     
     taskContext['failFast'] = failFast;
@@ -64,8 +64,10 @@ def call(Map params = [:]) {
         doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
       }
       
-      // doesn't work for multimodules yet
-      doCreateTask( os, siteJdk, siteMvn, tasks, first, 'site', taskContext )
+	  for (def jdk in siteJdks) {
+        // doesn't work for multimodules yet
+        doCreateTask( os, jdk, siteMvn, tasks, first, 'site', taskContext )
+	  }
       
       // run with apache-release profile, consider it a dryRun with SNAPSHOTs
       // doCreateTask( os, siteJdk, siteMvn, tasks, first, 'release', taskContext )
