@@ -135,7 +135,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 //  } else { // Requires authorization on SonarQube first
 //    cmd += 'sonar:sonar'
   }	  
-  if (nteger.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned']) {
+  if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned']) {
     cmd += "-Pci-reporting -Perrorprone" 
     taskContext['ciReportingRunned'] = true	  
   }
