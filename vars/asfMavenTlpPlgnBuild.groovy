@@ -133,7 +133,12 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
     cmd += '-Dfindbugs.skip=true'
 //  } else { // Requires authorization on SonarQube first
 //    cmd += 'sonar:sonar'
-  }
+  } else {
+    // TODO make this as a parameter such ciReportingProfle	  
+    cmd += '-Pci-reporting -Perrorprone' 	  
+  }	  
+	  
+	
 
   if (plan == 'build') {
       cmd += 'clean'
@@ -154,6 +159,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       cmd += 'verify'
       cmd += '-Papache-release'
   }
+  def ciReporting = first	
   def disablePublishers = !first
   first = false
   String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
@@ -215,6 +221,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
                  bat cmd.join(' ')
                 }
               }
+            }
+            if(ciReporting) {
+              recordIssues id: "${stageId}", name: "Static Analysis", aggregatingResults: true, enabledForFailure: true, tools: [mavenConsole(), java(), checkStyle(), spotBugs(), pmdParser(), errorProne()]    
             }
           } catch (Throwable e) {
             archiveDirs(taskContext.archives, stageDir)
