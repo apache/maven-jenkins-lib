@@ -160,7 +160,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       cmd += 'verify'
       cmd += '-Papache-release'
   }
-  def ciReporting = first	
+  def ciReporting = !taskContext['ciReportingRunned']	
   def disablePublishers = !first
   first = false
   String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
