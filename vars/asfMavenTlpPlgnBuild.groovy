@@ -123,6 +123,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
     echo "Skipping ${os}-jdk${jdk} as unsupported by Jenkins Environment"
     return;
   }
+  def recordReporting = false	
   def cmd = [
     'mvn', '-V',
     '-P+run-its',
@@ -137,7 +138,8 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   }	  
   if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned']) {
     cmd += "-Pci-reporting -Perrorprone" 
-    taskContext['ciReportingRunned'] = true	  
+    taskContext['ciReportingRunned'] = true	 
+    recordReporting = true	  
   }
 	
 
@@ -160,7 +162,6 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       cmd += 'verify'
       cmd += '-Papache-release'
   }
-  def ciReporting = !taskContext['ciReportingRunned']	
   def disablePublishers = !first
   first = false
   String stageId = "${os}-jdk${jdk}-m${maven}_${plan}"
@@ -223,8 +224,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
                 }
               }
             }
-            if(ciReporting) {
+            if(recordReporting) {
               recordIssues id: "${stageId}", name: "Static Analysis", aggregatingResults: true, enabledForFailure: true, tools: [mavenConsole(), java(), checkStyle(), spotBugs(), pmdParser(), errorProne()]    
+              recordReporting = false;		    
             }
           } catch (Throwable e) {
             archiveDirs(taskContext.archives, stageDir)
