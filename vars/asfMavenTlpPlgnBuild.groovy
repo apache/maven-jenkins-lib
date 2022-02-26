@@ -64,10 +64,10 @@ def call(Map params = [:]) {
         doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
       }
       
-	  for (def jdk in siteJdks) {
+      for (def jdk in siteJdks) {
         // doesn't work for multimodules yet
         doCreateTask( os, jdk, siteMvn, tasks, first, 'site', taskContext )
-	  }
+      }
       
       // run with apache-release profile, consider it a dryRun with SNAPSHOTs
       // doCreateTask( os, siteJdk, siteMvn, tasks, first, 'release', taskContext )
@@ -241,6 +241,6 @@ def archiveDirs(archives, stageDir) {
       archives.each { archivePrefix, pathToContent ->
 	    zip(zipFile: "${archivePrefix}-${stageDir}.zip", dir: pathToContent, archive: true)
       }
-	}
+    }
   }
 }
