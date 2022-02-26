@@ -226,6 +226,11 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
             }
             if(recordReporting) {
               recordIssues id: "${stageId}", name: "Static Analysis", aggregatingResults: true, enabledForFailure: true, tools: [mavenConsole(), java(), checkStyle(), spotBugs(), pmdParser(), errorProne()]    
+              jacoco inclusionPattern: '**/org/apache/maven/**/*.class',
+                     exclusionPattern: '',
+                     execPattern: '**/target/jacoco.exec',
+                     classPattern: '**/target/classes',
+                     sourcePattern: '**/src/main/java'		    
               recordReporting = false;		    
             }
           } catch (Throwable e) {
