@@ -44,7 +44,7 @@ def call(Map params = [:]) {
     def failFast = false;
     def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['8']
     def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
-    def siteOs = params.containsKey('siteOs') ? params.siteOs : ['linux']
+    def siteOses = params.containsKey('siteOs') ? params.siteOs : ['linux']
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     
     taskContext['failFast'] = failFast;
@@ -65,15 +65,16 @@ def call(Map params = [:]) {
         def mvn = jenkinsEnv.mavenForJdk(jdk)
         doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
       }
-      
-      for (def jdk in siteJdks) {
-        // doesn't work for multimodules yet
-        doCreateTask( siteOs, jdk, siteMvn, tasks, first, 'site', taskContext )
-      }
-      
+          
       // run with apache-release profile, consider it a dryRun with SNAPSHOTs
       // doCreateTask( os, siteJdk, siteMvn, tasks, first, 'release', taskContext )
     }
+    for (String os in siteOses) {	  
+      for (def jdk in siteJdks) {
+        // doesn't work for multimodules yet
+        doCreateTask( os, jdk, siteMvn, tasks, first, 'site', taskContext )
+      }	  
+    } 	    
     // run the parallel builds
     parallel(tasks)
 
