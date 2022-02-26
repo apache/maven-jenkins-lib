@@ -39,6 +39,7 @@ def call(Map params = [:]) {
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','17']
     def maven = params.containsKey('maven') ? params.maven : '3.6.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
+    def extraCmd = params.containsKey('extraCmd') ? params.extraCmd : ''
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
@@ -57,8 +58,8 @@ def call(Map params = [:]) {
         def cmd = [
           'mvn', '-V',
           '-P+run-its',
-          '-Dmaven.test.failure.ignore=true',
           '-Dfindbugs.failOnError=false',
+          extraCmd
         ]
         if (!first) {
           cmd += '-Dfindbugs.skip=true'
