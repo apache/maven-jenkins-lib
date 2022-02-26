@@ -52,6 +52,7 @@ def call(Map params = [:]) {
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
     taskContext['extraCmd'] = params.containsKey('extraCmd') ? params.extraCmd : ''
+    taskContext['ciReportingRunned'] = false	  
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -133,11 +134,11 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
     cmd += '-Dfindbugs.skip=true'
 //  } else { // Requires authorization on SonarQube first
 //    cmd += 'sonar:sonar'
-  } else {
-    // TODO make this as a parameter such ciReportingProfle	  
-    cmd += '-Pci-reporting -Perrorprone' 	  
   }	  
-	  
+  if (jdk >= 11 and !taskContext['ciReportingRunned']) {
+    cmd += "-Pci-reporting -Perrorprone" 
+    taskContext['ciReportingRunned'] = true	  
+  }
 	
 
   if (plan == 'build') {
