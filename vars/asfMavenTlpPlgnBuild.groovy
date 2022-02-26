@@ -50,6 +50,7 @@ def call(Map params = [:]) {
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
+    taskContext['extraCmd'] = params.containsKey('extraCmd') ? params.extraCmd : ''
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -122,9 +123,9 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   def cmd = [
     'mvn', '-V',
     '-P+run-its',
-    '-Dmaven.test.failure.ignore=true',
     '-Dfindbugs.failOnError=false',
     '-e',
+    taskContext.extraCmd  
   ]
   if (!first) {
     cmd += '-Dfindbugs.skip=true'
