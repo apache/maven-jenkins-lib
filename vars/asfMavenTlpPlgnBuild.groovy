@@ -46,13 +46,15 @@ def call(Map params = [:]) {
     def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
     def siteOses = params.containsKey('siteOs') ? params.siteOs : ['linux']
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
-    
+    def forceCiReporting = params.containsKey('forceCiReporting') ? params.forceReporting : false	
+    def runCiReporting = forceCiReporting || env.BRANCH_NAME == 'master'
+	  
     taskContext['failFast'] = failFast;
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
     taskContext['extraCmd'] = params.containsKey('extraCmd') ? params.extraCmd : ''
-    taskContext['ciReportingRunned'] = false	  
+    taskContext['ciReportingRunned'] = false 
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -60,11 +62,11 @@ def call(Map params = [:]) {
       for (def mvn in mavens) {
         def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
         jdks = jdks.findAll{ it != jdk }
-        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
+        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext, runCiReporting )
       }
       for (def jdk in jdks) {
         def mvn = jenkinsEnv.mavenForJdk(jdk)
-        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
+        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext, runCiReporting )
       }
           
       // run with apache-release profile, consider it a dryRun with SNAPSHOTs
@@ -73,7 +75,7 @@ def call(Map params = [:]) {
     for (String os in siteOses) {	  
       for (def jdk in siteJdks) {
         // doesn't work for multimodules yet
-        doCreateTask( os, jdk, siteMvn, tasks, first, 'site', taskContext )
+        doCreateTask( os, jdk, siteMvn, tasks, first, 'site', taskContext, false )
       }	  
     } 	    
     // run the parallel builds
@@ -108,12 +110,12 @@ def call(Map params = [:]) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${taskContext.failingFast}\n\n***** FAST FAILURE *****"
     }
     stage("Notifications") {
-	  jenkinsNotify()
+      jenkinsNotify()
     }
   }
 }
 
-def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
+def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext, runCiReporting )
 {
   String label = jenkinsEnv.labelForOS(os);
   String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
@@ -131,12 +133,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
     '-e',
     taskContext.extraCmd  
   ]
-  if (!first) {
-    cmd += '-Dfindbugs.skip=true'
-//  } else { // Requires authorization on SonarQube first
-//    cmd += 'sonar:sonar'
-  }	  
-  if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned']) {
+  if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned'] && runCiReporting) {
     cmd += "-Pci-reporting -Perrorprone" 
     taskContext['ciReportingRunned'] = true	 
     recordReporting = true	  
