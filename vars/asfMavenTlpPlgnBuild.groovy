@@ -136,13 +136,14 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext, runCiReportin
   if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned'] && runCiReporting) {
     cmd += "-Pci-reporting -Perrorprone" 
     taskContext['ciReportingRunned'] = true	 
-    recordReporting = true	  
+    recordReporting = true	
+    echo "CI Reporting triggered for OS: ${os} JDK: ${jdk} Maven: ${maven}" 	  
   }
 	
 
   if (plan == 'build') {
       cmd += 'clean'
-      if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.6.x' && os == 'linux' ) {
+      if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.8.x' && os == 'linux' ) {
         cmd += 'deploy'		      
       } else {
         cmd += 'verify -Dpgpverify.skip'      
