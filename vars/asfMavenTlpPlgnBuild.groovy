@@ -48,7 +48,7 @@ def call(Map params = [:]) {
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     def forceCiReporting = params.containsKey('forceCiReporting') ? params.forceReporting : false	
     def runCiReporting = forceCiReporting || env.BRANCH_NAME == 'master'
-    echo "runCiReporting " + runCiReporting
+    echo "runCiReporting: " + runCiReporting + ", forceCiReporting: "+ forceCiReporting
 	  
     taskContext['failFast'] = failFast;
     taskContext['tmpWs'] = tmpWs;
