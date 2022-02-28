@@ -45,7 +45,7 @@ def call(Map params = [:]) {
     def forceCiReporting = params.containsKey('forceCiReporting') ? params.forceCiReporting : false	
     def runCiReporting = forceCiReporting || env.BRANCH_NAME == 'master'
     echo "runCiReporting: " + runCiReporting + ", forceCiReporting: "+ forceCiReporting
-    def ciReportingRunned = false 
+    def ciReportingRunned = false 	  
     def failFast = false;
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -65,10 +65,9 @@ def call(Map params = [:]) {
           '-Dfindbugs.failOnError=false',
           extraCmd
         ]
-        if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned'] && runCiReporting) {
+        if (Integer.parseInt(jdk) >= 11 && !ciReportingRunned && runCiReporting) {
           cmd += "-Pci-reporting -Perrorprone" 
           ciReportingRunned = true	 
-          recordReporting = true	
           echo "CI Reporting triggered for OS: ${os} JDK: ${jdk} Maven: ${maven}" 	  
         }
         cmd += 'clean'
@@ -132,7 +131,7 @@ def call(Map params = [:]) {
                         }
                       }
                     }
-                    if(recordReporting) {
+                    if(!ciReportingRunned) {
                       recordIssues id: "${os}-jdk${jdk}", name: "Static Analysis", 
 		                               aggregatingResults: true, enabledForFailure: true, 
 		                               tools: [mavenConsole(), java(), checkStyle(), spotBugs(), pmdParser(), errorProne(),tagList()]    
@@ -141,7 +140,7 @@ def call(Map params = [:]) {
                              execPattern: '**/target/jacoco*.exec',
                              classPattern: '**/target/classes',
                              sourcePattern: '**/src/main/java'		    
-                      recordReporting = false;		    
+                      ciReportingRunned = true;				    
                     }                    
                   } catch (Throwable e) {
                     echo "[FAILURE-004] ${e}"
