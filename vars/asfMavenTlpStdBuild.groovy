@@ -42,6 +42,10 @@ def call(Map params = [:]) {
     def extraCmd = params.containsKey('extraCmd') ? params.extraCmd : ''
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
+    def forceCiReporting = params.containsKey('forceCiReporting') ? params.forceCiReporting : false	
+    def runCiReporting = forceCiReporting || env.BRANCH_NAME == 'master'
+    echo "runCiReporting: " + runCiReporting + ", forceCiReporting: "+ forceCiReporting
+    def ciReportingRunned = false 
     def failFast = false;
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -61,8 +65,11 @@ def call(Map params = [:]) {
           '-Dfindbugs.failOnError=false',
           extraCmd
         ]
-        if (!first) {
-          cmd += '-Dfindbugs.skip=true'
+        if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned'] && runCiReporting) {
+          cmd += "-Pci-reporting -Perrorprone" 
+          ciReportingRunned = true	 
+          recordReporting = true	
+          echo "CI Reporting triggered for OS: ${os} JDK: ${jdk} Maven: ${maven}" 	  
         }
         cmd += 'clean'
         if (env.BRANCH_NAME == 'master' && jdk == '17' && os == 'linux' ) {
@@ -115,7 +122,6 @@ def call(Map params = [:]) {
                                 findbugsPublisher(disabled: disablePublishers),
                                 openTasksPublisher(disabled: disablePublishers),
                                 dependenciesFingerprintPublisher(disabled: disablePublishers),
-    // DISABLED DUE TO INFRA-17514 invokerPublisher(),
                                 pipelineGraphPublisher(disabled: disablePublishers)
                               ], publisherStrategy: 'EXPLICIT') {
                     dir ('m') {
@@ -126,6 +132,17 @@ def call(Map params = [:]) {
                         }
                       }
                     }
+                    if(recordReporting) {
+                      recordIssues id: "${os}-jdk${jdk}", name: "Static Analysis", 
+		                               aggregatingResults: true, enabledForFailure: true, 
+		                               tools: [mavenConsole(), java(), checkStyle(), spotBugs(), pmdParser(), errorProne(),tagList()]    
+                      jacoco inclusionPattern: '**/org/apache/maven/**/*.class',
+                             exclusionPattern: '',
+                             execPattern: '**/target/jacoco*.exec',
+                             classPattern: '**/target/classes',
+                             sourcePattern: '**/src/main/java'		    
+                      recordReporting = false;		    
+                    }                    
                   } catch (Throwable e) {
                     echo "[FAILURE-004] ${e}"
                     // First step to keep the workspace clean and safe disk space
