@@ -66,7 +66,7 @@ def call(Map params = [:]) {
           extraCmd
         ]
         if (Integer.parseInt(jdk) >= 11 && !ciReportingRunned && runCiReporting) {
-          cmd += "-Pci-reporting -Perrorprone" 
+          cmd += "-Pci-reporting -Perrorprone -U" 
           ciReportingRunned = true	 
           echo "CI Reporting triggered for OS: ${os} JDK: ${jdk} Maven: ${maven}" 	  
         }
