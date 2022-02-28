@@ -46,7 +46,7 @@ def call(Map params = [:]) {
     def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
     def siteOses = params.containsKey('siteOs') ? params.siteOs : ['linux']
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
-    def forceCiReporting = params.containsKey('forceCiReporting') ? params.forceReporting : false	
+    def forceCiReporting = params.containsKey('forceCiReporting') ? params.forceCiReporting : false	
     def runCiReporting = forceCiReporting || env.BRANCH_NAME == 'master'
     echo "runCiReporting: " + runCiReporting + ", forceCiReporting: "+ forceCiReporting
 	  
