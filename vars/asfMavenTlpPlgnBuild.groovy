@@ -135,7 +135,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext, runCiReportin
     taskContext.extraCmd  
   ]
   if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned'] && runCiReporting) {
-    cmd += "-Pci-reporting -Perrorprone" 
+    cmd += "-Pci-reporting -Perrorprone -U" 
     taskContext['ciReportingRunned'] = true	 
     recordReporting = true	
     echo "CI Reporting triggered for OS: ${os} JDK: ${jdk} Maven: ${maven}" 	  
