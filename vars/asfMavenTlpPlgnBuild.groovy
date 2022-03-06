@@ -42,9 +42,9 @@ def call(Map params = [:]) {
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
-    def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['8']
-    def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
     def siteOses = params.containsKey('siteOs') ? params.siteOs : ['linux']
+    def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['11']
+    def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     def forceCiReporting = params.containsKey('forceCiReporting') ? params.forceCiReporting : false	
     def runCiReporting = forceCiReporting || env.BRANCH_NAME == 'master'
