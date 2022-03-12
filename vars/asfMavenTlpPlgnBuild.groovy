@@ -21,6 +21,8 @@
 
 def call(Map params = [:]) {
   Map taskContext = [:]
+  def branchesToNofify = params.contains("branchesToNofify") ? params.branchesToNofify : ['master', 'main']
+
   try {
     def buildProperties = []
     if (env.BRANCH_NAME == 'master') {
@@ -45,6 +47,7 @@ def call(Map params = [:]) {
     def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['11']
     def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
+
     
     taskContext['failFast'] = failFast;
     taskContext['tmpWs'] = tmpWs;
@@ -103,9 +106,11 @@ def call(Map params = [:]) {
     if (taskContext.failingFast != null) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${taskContext.failingFast}\n\n***** FAST FAILURE *****"
     }
-    stage("Notifications") {
-	  jenkinsNotify()
-    }
+    if (branchesToNofify.contains(env.BRANCH_NAME)) { 	  
+      stage("Notifications") {
+        jenkinsNotify()
+      }
+    }		  
   }
 }
 
