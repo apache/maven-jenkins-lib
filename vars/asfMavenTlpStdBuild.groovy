@@ -21,7 +21,7 @@
 
 def call(Map params = [:]) {
   def failingFast = null
-  def branchesToNofify = params.contains("branchesToNofify") ? params.branchesToNofify : ['master', 'main']
+  def branchesToNofify = params.containsKey("branchesToNofify") ? params.branchesToNofify : ['master', 'main']
   try {
     def buildProperties = []
     if (env.BRANCH_NAME == 'master') {
