@@ -2,13 +2,18 @@
 
 This repository contains the Jenkins shared libraries that define the standard build process for Apache Maven subprojects.
 
-The shared libraries rely on a definition of the per-Jenkins instance specific configuration details.
-The definition of those instance specific configuration details as customized for the Apache build server is hosted in https://gitbox.apache.org/repos/asf?p=maven-jenkins-env.git[maven-jenkins-env]
+== asfMavenTlpStdBuild() (building Maven plugins)
 
-If you want to build the Apache Maven repositories on your own Jenkins infrastructure you will need to define two shared libraries:
+==== Accepted parameters:
+- `os`: array of possible os to build projects (default: `['linux', 'windows']`)
+- `jdks`: array of jdks used for the build (default: `['8','11','17']`)
+- `mavens`: array of maven versions used for build (default: `['3.2.x','3.6.x', '3.8.x']`)
+- `siteJdks`: array of jdks used for the site build (default: `[11']`)
+- `siteMvn`: jdk used to build the site (default: `3.8.x`)
+- `tmpWs`: boolean to shorten working directory on windows platform
+- `branchesToNofify`: array of branches to send notifications of the build (default: `['master', 'main']`)
 
-. The first shared library should be a clone of https://gitbox.apache.org/repos/asf?p=maven-jenkins-env.git[maven-jenkins-env.git] with the environment specifics modified to match your own Jenkins environment
-. The second shared library should be this shared library which defines the standard Apache Maven build process
-
-If you would like more information on the design of this Jenkinsfile structure see https://www.youtube.com/watch?v=s4w8BX3xi4M[Episode 4] and https://www.youtube.com/watch?v=vfAzhVDxOOk[Episode 5] of Stephen Connolly's "Watch Me Code" series:
-you can also look at resulting https://github.com/stephenc/asf-gitpubsub-jenkins-plugin[ASF's GitPubSub Jenkins Plugin].
+Example to use a specific set of jdks and maven core
+```
+asfMavenTlpStdBuild(jdks:[ "8", "11" ], mavens: ["3.8.x"])
+```
