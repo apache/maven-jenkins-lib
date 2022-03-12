@@ -45,12 +45,14 @@ def call(Map params = [:]) {
     def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['11']
     def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
+    def branchesToNofify = params.contains("branchesToNofify") ? params.branchesToNofify : ['master', 'main'] 	  
     
     taskContext['failFast'] = failFast;
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
-
+    
+	   
     Map tasks = [failFast: failFast]
     boolean first = true
     for (String os in oses) {
@@ -103,9 +105,11 @@ def call(Map params = [:]) {
     if (taskContext.failingFast != null) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${taskContext.failingFast}\n\n***** FAST FAILURE *****"
     }
-    stage("Notifications") {
-	  jenkinsNotify()
-    }
+    if (branchesToNofify.contains(env.BRANCH_NAME)) { 	  
+      stage("Notifications") {
+        jenkinsNotify()
+      }
+    }		  
   }
 }
 
