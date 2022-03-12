@@ -2,7 +2,7 @@
 
 This repository contains the Jenkins shared libraries that define the standard build process for Apache Maven subprojects.
 
-== asfMavenTlpStdBuild() (building Maven plugins)
+== asfMavenTlpPlgnBuild() (building Maven plugins)
 
 ==== Accepted parameters:
 - `os`: array of possible os to build projects (default: `['linux', 'windows']`)
@@ -15,7 +15,7 @@ This repository contains the Jenkins shared libraries that define the standard b
 
 Example to use a specific set of jdks and maven core
 ```
-asfMavenTlpStdBuild(jdks:[ "8", "11" ], mavens: ["3.8.x"])
+asfMavenTlpPlgnBuild(jdks:[ "8", "11" ], mavens: ["3.8.x"])
 ```
 
 == asfMavenTlpStdBuild() (building Other projects)
