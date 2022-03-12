@@ -51,8 +51,7 @@ def call(Map params = [:]) {
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
-    
-	   
+
     Map tasks = [failFast: failFast]
     boolean first = true
     for (String os in oses) {
