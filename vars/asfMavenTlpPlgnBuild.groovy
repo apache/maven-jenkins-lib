@@ -38,18 +38,24 @@ def call(Map params = [:]) {
 	// minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','17']
     def jdkMin = jdks[0];
-    def mavens = params.containsKey('maven') ? params.maven : ['3.2.x','3.6.x', '3.8.x']
+    def mavens = params.containsKey('maven') ? params.maven : ['3.6.x','3.8.x']
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
+    def siteOses = params.containsKey('siteOs') ? params.siteOs : ['linux']
     def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['11']
     def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
-    
+    def forceCiReporting = params.containsKey('forceCiReporting') ? params.forceCiReporting : false	
+    def runCiReporting = forceCiReporting || env.BRANCH_NAME == 'master'
+    echo "runCiReporting: " + runCiReporting + ", forceCiReporting: "+ forceCiReporting
+	  
     taskContext['failFast'] = failFast;
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
+    taskContext['extraCmd'] = params.containsKey('extraCmd') ? params.extraCmd : ''
+    taskContext['ciReportingRunned'] = false 
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -57,21 +63,22 @@ def call(Map params = [:]) {
       for (def mvn in mavens) {
         def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
         jdks = jdks.findAll{ it != jdk }
-        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
+        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext, runCiReporting )
       }
       for (def jdk in jdks) {
         def mvn = jenkinsEnv.mavenForJdk(jdk)
-        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
+        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext, runCiReporting )
       }
-      
-	  for (def jdk in siteJdks) {
-        // doesn't work for multimodules yet
-        doCreateTask( os, jdk, siteMvn, tasks, first, 'site', taskContext )
-	  }
-      
+          
       // run with apache-release profile, consider it a dryRun with SNAPSHOTs
       // doCreateTask( os, siteJdk, siteMvn, tasks, first, 'release', taskContext )
     }
+    for (String os in siteOses) {	  
+      for (def jdk in siteJdks) {
+        // doesn't work for multimodules yet
+        doCreateTask( os, jdk, siteMvn, tasks, first, 'site', taskContext, false )
+      }	  
+    } 	    
     // run the parallel builds
     parallel(tasks)
 
@@ -104,12 +111,12 @@ def call(Map params = [:]) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${taskContext.failingFast}\n\n***** FAST FAILURE *****"
     }
     stage("Notifications") {
-	  jenkinsNotify()
+      jenkinsNotify()
     }
   }
 }
 
-def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
+def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext, runCiReporting )
 {
   String label = jenkinsEnv.labelForOS(os);
   String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
@@ -119,22 +126,25 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
     echo "Skipping ${os}-jdk${jdk} as unsupported by Jenkins Environment"
     return;
   }
+  def recordReporting = false	
   def cmd = [
     'mvn', '-V',
     '-P+run-its',
-    '-Dmaven.test.failure.ignore=true',
     '-Dfindbugs.failOnError=false',
     '-e',
+    taskContext.extraCmd  
   ]
-  if (!first) {
-    cmd += '-Dfindbugs.skip=true'
-//  } else { // Requires authorization on SonarQube first
-//    cmd += 'sonar:sonar'
+  if (Integer.parseInt(jdk) >= 11 && !taskContext['ciReportingRunned'] && runCiReporting) {
+    cmd += "-Pci-reporting -Perrorprone -U" 
+    taskContext['ciReportingRunned'] = true	 
+    recordReporting = true	
+    echo "CI Reporting triggered for OS: ${os} JDK: ${jdk} Maven: ${maven}" 	  
   }
+	
 
   if (plan == 'build') {
       cmd += 'clean'
-      if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.6.x' && os == 'linux' ) {
+      if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.8.x' && os == 'linux' ) {
         cmd += 'deploy'		      
       } else {
         cmd += 'verify -Dpgpverify.skip'      
@@ -213,6 +223,17 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
                 }
               }
             }
+            if(recordReporting) {
+              recordIssues id: "${os}-jdk${jdk}", name: "Static Analysis", 
+		           aggregatingResults: true, enabledForFailure: true, 
+		           tools: [mavenConsole(), java(), checkStyle(), spotBugs(), pmdParser(), errorProne(),tagList()]    
+              jacoco inclusionPattern: '**/org/apache/maven/**/*.class',
+                     exclusionPattern: '',
+                     execPattern: '**/target/jacoco.exec',
+                     classPattern: '**/target/classes',
+                     sourcePattern: '**/src/main/java'		    
+              recordReporting = false;		    
+            }
           } catch (Throwable e) {
             archiveDirs(taskContext.archives, stageDir)
             // First step to keep the workspace clean and safe disk space
@@ -241,6 +262,6 @@ def archiveDirs(archives, stageDir) {
       archives.each { archivePrefix, pathToContent ->
 	    zip(zipFile: "${archivePrefix}-${stageDir}.zip", dir: pathToContent, archive: true)
       }
-	}
+    }
   }
 }
