@@ -21,7 +21,7 @@
 
 def call(Map params = [:]) {
   Map taskContext = [:]
-  def branchesToNofify = params.contains("branchesToNofify") ? params.branchesToNofify : ['master', 'main']
+  def branchesToNofify = params.containsKey("branchesToNofify") ? params.branchesToNofify : ['master', 'main']
 
   try {
     def buildProperties = []
@@ -106,7 +106,7 @@ def call(Map params = [:]) {
     if (taskContext.failingFast != null) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${taskContext.failingFast}\n\n***** FAST FAILURE *****"
     }
-    if (branchesToNofify.containsKey(env.BRANCH_NAME)) { 	  
+    if (branchesToNofify.contains(env.BRANCH_NAME)) { 	  
       stage("Notifications") {
         jenkinsNotify()
       }
