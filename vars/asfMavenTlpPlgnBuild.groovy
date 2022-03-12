@@ -106,7 +106,7 @@ def call(Map params = [:]) {
     if (taskContext.failingFast != null) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${taskContext.failingFast}\n\n***** FAST FAILURE *****"
     }
-    if (branchesToNofify.contains(env.BRANCH_NAME)) { 	  
+    if (branchesToNofify.containsKey(env.BRANCH_NAME)) { 	  
       stage("Notifications") {
         jenkinsNotify()
       }
