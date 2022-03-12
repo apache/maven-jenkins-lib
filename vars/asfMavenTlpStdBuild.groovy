@@ -42,6 +42,8 @@ def call(Map params = [:]) {
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
+    def branchesToNofify = params.contains("branchesToNofify") ? params.branchesToNofify : ['master', 'main']
+
     Map tasks = [failFast: failFast]
     boolean first = true
     for (String os in oses) {
@@ -186,8 +188,10 @@ def call(Map params = [:]) {
     if (failingFast != null) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${failingFast}\n\n***** FAST FAILURE *****"
     }
-    stage("Notifications") {
-      jenkinsNotify()
+    if (branchesToNofify.contains(env.BRANCH_NAME)) {
+      stage("Notifications") {
+        jenkinsNotify()
+      }
     }
   }
 }
