@@ -126,6 +126,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   }
   def cmd = [
     'mvn', '-V',
+    '-DtrimStackTrace=false', 
     '-P+run-its',
     '-Dmaven.test.failure.ignore=true',
     '-Dfindbugs.failOnError=false',
