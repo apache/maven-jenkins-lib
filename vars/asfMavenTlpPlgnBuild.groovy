@@ -201,7 +201,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
             println "Local Repo (${stageId}): ${localRepo}"
 	    println "Jdk $jdkName, mvnName $mvnName" 	  
             cmd += " -Dmaven.repo.local=../.maven_repositories/${env.EXECUTOR_NUMBER}"
-	    cmd += " -Dinvoker.writeJunitReport=true"	  
+	    cmd += " -Dinvoker.writeJunitReport=true -B"	  
       	    withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
                "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {		    
