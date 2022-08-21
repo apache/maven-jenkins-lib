@@ -199,16 +199,11 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
           } else try {
             def localRepo = "../.maven_repositories/${env.EXECUTOR_NUMBER}"
             println "Local Repo (${stageId}): ${localRepo}"
-            withMaven(jdk:jdkName, maven:mvnName, mavenLocalRepo:localRepo, options: [
-              artifactsPublisher(disabled: disablePublishers),
-              junitPublisher(ignoreAttachments: false),
-              findbugsPublisher(disabled: disablePublishers),
-              openTasksPublisher(disabled: disablePublishers),
-              dependenciesFingerprintPublisher(disabled: disablePublishers),
-              invokerPublisher(),
-              pipelineGraphPublisher(disabled: disablePublishers),
-              mavenLinkerPublisher(disabled: false)
-           ], publisherStrategy: 'EXPLICIT') {
+            cmd += " -Dmaven.repo.local=../.maven_repositories/${env.EXECUTOR_NUMBER}"
+	    cmd += " -Dinvoker.writeJunitReport=true"	  
+      	    withEnv(["JAVA_HOME=${ tool "$jdkName" }",
+               "PATH+MAVEN=${ tool "$jdk" }/bin:${tool "$mvnName"}/bin",
+               "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {		    
              dir (stageDir) {
                if (isUnix()) {
                  sh 'df -hT'
@@ -233,6 +228,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
             }
           } finally {
+	    junit testResults: '**/target/surefire-reports/*.xml,**/target/invoker-reports/TEST*.xml', allowEmptyResults: true	  
             cleanWs()
           }  
         }
