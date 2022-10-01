@@ -37,7 +37,7 @@ def call(Map params = [:]) {
 
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux']
-	// minimum, LTS, current and next ea
+    // minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','17']
     def jdkMin = jdks[0];
     def mavens = params.containsKey('maven') ? params.maven : ['3.2.x','3.6.x', '3.8.x']
@@ -66,11 +66,11 @@ def call(Map params = [:]) {
         def mvn = jenkinsEnv.mavenForJdk(jdk)
         doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
       }
-      
-	  for (def jdk in siteJdks) {
+
+      for (def jdk in siteJdks) {
         // doesn't work for multimodules yet
         doCreateTask( os, jdk, siteMvn, tasks, first, 'site', taskContext )
-	  }
+      }
       
       // run with apache-release profile, consider it a dryRun with SNAPSHOTs
       // doCreateTask( os, siteJdk, siteMvn, tasks, first, 'release', taskContext )
@@ -110,7 +110,7 @@ def call(Map params = [:]) {
       stage("Notifications") {
         jenkinsNotify()
       }
-    }		  
+    }
   }
 }
 
@@ -141,7 +141,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   if (plan == 'build') {
       cmd += 'clean'
       if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.6.x' && os == 'linux' ) {
-        cmd += 'deploy'		      
+        cmd += 'deploy'
       } else {
         cmd += 'verify -Dpgpverify.skip'      
       }	      
@@ -163,12 +163,12 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   tasks[stageId] = {
     node(jenkinsEnv.nodeSelection(label)) {
       def wsDir = pwd()
-	  def stageDir = stageId
-	  if (os == 'windows' && taskContext.tmpWs) {
-//	    wsDir = "$TEMP\\$BUILD_TAG" // or use F:\jenkins\jenkins-slave\workspace or F:\short
-	    wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)maven-(.+)-plugin(.*)/) { "m-${it[2]}-p${it[3]}" }
-		stageDir = "j${jdk}m${maven}" + plan.take(1)
-	  }
+      def stageDir = stageId
+      if (os == 'windows' && taskContext.tmpWs) {
+//      wsDir = "$TEMP\\$BUILD_TAG" // or use F:\jenkins\jenkins-slave\workspace or F:\short
+        wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)maven-(.+)-plugin(.*)/) { "m-${it[2]}-p${it[3]}" }
+        stageDir = "j${jdk}m${maven}" + plan.take(1)
+      }
       ws( dir : "$wsDir" )
       {
         stage("Checkout ${stageId}") {
@@ -199,12 +199,12 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
           } else try {
             def localRepo = "../.maven_repositories/${env.EXECUTOR_NUMBER}"
             println "Local Repo (${stageId}): ${localRepo}"
-	    println "Jdk $jdkName, mvnName $mvnName" 	  
+            println "Jdk $jdkName, mvnName $mvnName"
             cmd += " -Dmaven.repo.local=../.maven_repositories/${env.EXECUTOR_NUMBER}"
-	    cmd += " -Dinvoker.writeJunitReport=true -B"	  
-      	    withEnv(["JAVA_HOME=${ tool "$jdkName" }",
+            cmd += " -Dinvoker.writeJunitReport=true -B"
+            withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
-               "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {		    
+               "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
              dir (stageDir) {
                if (isUnix()) {
                  sh 'df -hT'
@@ -229,7 +229,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
               echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
             }
           } finally {
-	    junit testResults: '**/target/surefire-reports/*.xml,**/target/invoker-reports/TEST*.xml', allowEmptyResults: true	  
+            junit testResults: '**/target/surefire-reports/*.xml,**/target/failsafe-reports/*.xml,**/target/invoker-reports/TEST*.xml', allowEmptyResults: true
             cleanWs()
           }  
         }
@@ -242,8 +242,8 @@ def archiveDirs(archives, stageDir) {
   if (archives != null) {
     dir(stageDir) {
       archives.each { archivePrefix, pathToContent ->
-	    zip(zipFile: "${archivePrefix}-${stageDir}.zip", dir: pathToContent, archive: true)
+        zip(zipFile: "${archivePrefix}-${stageDir}.zip", dir: pathToContent, archive: true)
       }
-	}
+    }
   }
 }
