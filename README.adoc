@@ -7,7 +7,7 @@ This repository contains the Jenkins shared libraries that define the standard b
 ==== Accepted parameters:
 - `os`: array of possible os to build projects (default: `['linux', 'windows']`)
 - `jdks`: array of jdks used for the build (default: `['8','11','17']`)
-- `maven`: array of maven versions used for build (default: `['3.2.x','3.6.x', '3.8.x']`)
+- `maven`: array of maven versions used for build (default: `['3.6.x', '3.8.x']`)
 - `siteJdk`: array of jdks used for the site build (default: `[11']`)
 - `siteMvn`: jdk used to build the site (default: `3.8.x`)
 - `tmpWs`: boolean to shorten working directory on windows platform
