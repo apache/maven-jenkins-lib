@@ -38,7 +38,7 @@ def call(Map params = [:]) {
     def oses = params.containsKey('os') ? params.os : ['linux']
     // minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','17']
-    def maven = params.containsKey('maven') ? params.maven : '3.8.x'
+    def maven = params.containsKey('maven') ? params.maven : '3.9.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     def mavenArgs = params.containsKey('mavenArgs') ? params.mavenArgs : ''
     // def failFast = params.containsKey('failFast') ? params.failFast : true

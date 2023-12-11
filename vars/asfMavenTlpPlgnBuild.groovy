@@ -40,12 +40,12 @@ def call(Map params = [:]) {
     // minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','17']
     def jdkMin = jdks[0];
-    def mavens = params.containsKey('maven') ? params.maven : ['3.6.x', '3.8.x']
+    def mavens = params.containsKey('maven') ? params.maven : ['3.6.x', '3.9.x']
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
     def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['11']
-    def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.8.x'
+    def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.9.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
 
     
@@ -140,7 +140,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 
   if (plan == 'build') {
       cmd += 'clean'
-      if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.6.x' && os == 'linux' ) {
+      if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.9.x' && os == 'linux' ) {
         cmd += 'deploy'
       } else {
         cmd += 'verify -Dpgpverify.skip'      
