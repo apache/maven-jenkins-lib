@@ -58,13 +58,9 @@ def call(Map params = [:]) {
     boolean first = true
     for (String os in oses) {
       for (def mvn in mavens) {
-        def jdk = Math.max( jdkMin as Integer, jenkinsEnv.jdkForMaven( mvn ) as Integer) as String
-        jdks = jdks.findAll{ it != jdk }
-        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
-      }
-      for (def jdk in jdks) {
-        def mvn = jenkinsEnv.mavenForJdk(jdk)
-        doCreateTask( os, jdk, mvn, tasks, first, 'build', taskContext )
+        for (def jdk in jdks) {
+          doCreateTask(os, jdk, mvn, tasks, first, 'build', taskContext)
+        }
       }
 
       for (def jdk in siteJdks) {
