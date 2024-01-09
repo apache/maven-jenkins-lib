@@ -38,7 +38,7 @@ def call(Map params = [:]) {
     // now determine the matrix of parallel builds
     def oses = params.containsKey('os') ? params.os : ['linux']
     // minimum, LTS, current and next ea
-    def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','17']
+    def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','17','21']
     def jdkMin = jdks[0];
     def mavens = params.containsKey('maven') ? params.maven : ['3.6.x', '3.9.x']
     // def failFast = params.containsKey('failFast') ? params.failFast : true
@@ -136,7 +136,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 
   if (plan == 'build') {
       cmd += 'clean'
-      if (env.BRANCH_NAME == 'master' && jdk == '17' && maven == '3.9.x' && os == 'linux' ) {
+      if (env.BRANCH_NAME == 'master' && jdk == '21' && maven == '3.9.x' && os == 'linux' ) {
         cmd += 'deploy'
       } else {
         cmd += 'verify -Dpgpverify.skip'      
