@@ -86,26 +86,6 @@ def call(Map params = [:]) {
                 wsDir = 'F:\\short\\' + "$BUILD_TAG".replaceAll(/(.+)-maven-box-maven-(.+)/) { "m-${it[2]}" }
               }
               ws( dir : "$wsDir" ) {
-                stage("Checkout ${stageId}") {
-                  echo "NODE_NAME = ${env.NODE_NAME}"
-                  try {
-                    dir('m') {
-                      checkout scm
-                    }
-                  } catch (Throwable e) {
-                    // First step to keep the workspace clean and safe disk space
-                    cleanWs()
-                    if (!failFast) {
-                      throw e
-                    } else if (failingFast == null) {
-                      failingFast = stageId
-                      echo "[FAIL FAST] This is the first failure and likely root cause"
-                      throw e
-                    } else {
-                      echo "[FAIL FAST] ${failingFast} had first failure, ignoring ${e.message}"
-                    }
-                  }
-                }
                 stage("Build ${stageId}") {
                   if (failingFast != null) {
                     cleanWs()
@@ -122,7 +102,8 @@ def call(Map params = [:]) {
     // DISABLED DUE TO INFRA-17514 invokerPublisher(),
                                 pipelineGraphPublisher(disabled: disablePublishers)
                               ], publisherStrategy: 'EXPLICIT') {
-                    dir ('m') {
+                      dir ('m') {
+                        checkout scm
                         if (isUnix()) {
                           sh cmd.join(' ')
                         } else {

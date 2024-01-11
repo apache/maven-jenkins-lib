@@ -167,27 +167,6 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
       }
       ws( dir : "$wsDir" )
       {
-        stage("Checkout ${stageId}") {
-          echo "NODE_NAME = ${env.NODE_NAME}"
-          try {
-            dir(stageDir) {
-              checkout scm
-            }
-          } catch (Throwable e) {
-            // First step to keep the workspace clean and safe disk space
-            cleanWs()
-
-            if (!taskContext.failFast) {
-              throw e
-            } else if (taskContext.failingFast == null) {
-              taskContext.failingFast = stageId
-              echo "[FAIL FAST] This is the first failure and likely root cause"
-              throw e
-            } else {
-              echo "[FAIL FAST] ${taskContext.failingFast} had first failure, ignoring ${e.message}"
-            }
-          } 
-        }
         stage("Build ${stageId}") {
           if (taskContext.failingFast != null) {
             cleanWs()
@@ -202,6 +181,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
                "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
              dir (stageDir) {
+               checkout scm
                if (isUnix()) {
                  sh 'df -hT'
                  sh cmd.join(' ')
