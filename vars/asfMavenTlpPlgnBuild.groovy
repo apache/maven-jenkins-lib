@@ -53,6 +53,7 @@ def call(Map params = [:]) {
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
+    taskContext['maven4xBuild'] = params.maven4xBuild
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -115,7 +116,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
   String label = jenkinsEnv.labelForOS(os);
   String jdkName = jenkinsEnv.jdkFromVersion(os, "${jdk}")
   String mvnName = jenkinsEnv.mvnFromVersion(os, "${maven}")
-  echo "OS: ${os} JDK: ${jdk} Maven: ${maven} => Label: ${label} JDK: ${jdkName} Maven: ${mvnName}"
+  echo "OS: ${os} JDK: ${jdk} Maven: ${maven} => Label: ${label} JDKName: ${jdkName} MavenName: ${mvnName}"
   if (label == null || jdkName == null || mvnName == null) {
     echo "Skipping ${os}-jdk${jdk} as unsupported by Jenkins Environment"
     return;
@@ -136,7 +137,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 
   if (plan == 'build') {
       cmd += 'clean'
-      if (env.BRANCH_NAME == 'master' && jdk == '21' && maven == '3.9.x' && os == 'linux' ) {
+      if (env.BRANCH_NAME == 'master' && jdk == '21' && (maven == '3.9.x' || taskContext.maven4xBuild) && os == 'linux' ) {
         cmd += 'deploy'
       } else {
         cmd += 'verify -Dpgpverify.skip'      
