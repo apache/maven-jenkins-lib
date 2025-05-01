@@ -24,7 +24,7 @@ def call(Map params = [:]) {
   def branchesToNotify = params.containsKey("branchesToNotify") ? params.branchesToNotify : ['master', 'main']
   try {
     def buildProperties = []
-    if (env.BRANCH_NAME == 'master') {
+    if (branchesToNotify.contains(env.BRANCH_NAME)) {
       // set build retention time first
       buildProperties.add(buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '15', numToKeepStr: '10')))
       // ensure a build is done every month
@@ -69,7 +69,7 @@ def call(Map params = [:]) {
         }
         cmd += 'clean'
         cmd += mavenArgs
-        if (env.BRANCH_NAME == 'master' && jdk == '21' && os == 'linux' ) {
+        if (branchesToNotify.contains(env.BRANCH_NAME) && jdk == '21' && os == 'linux' ) {
           cmd += 'deploy'
         } else {
           cmd += 'verify -Dpgpverify.skip'
