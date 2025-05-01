@@ -6,7 +6,7 @@ This repository contains the Jenkins shared libraries that define the standard b
 
 ==== Accepted parameters:
 - `os`: array of possible os to build projects (default: `['linux']`)
-- `jdks`: array of jdks used for the build (default: `['8','11','17']`)
+- `jdks`: array of jdks used for the build (default: `['8','11','17', '21']`)
 - `maven`: array of maven versions used for build (default: `['3.6.x', '3.9.x']`)
 - `siteJdk`: array of jdks used for the site build (default: `[11']`)
 - `siteMvn`: jdk used to build the site (default: `3.9.x`)
@@ -22,10 +22,10 @@ asfMavenTlpPlgnBuild(jdks:[ "8", "11" ], maven: ["3.8.x"])
 
 ==== Accepted parameters:
 - `os`: array of possible os to build projects (default: `['linux']`)
-- `jdks`: array of jdks used for the build (default: `['8','11','17']`)
+- `jdks`: array of jdks used for the build (default: `['8','11','17', '21']`)
 - `maven`: maven versions used for build (default: `3.9.x`)
 - `tmpWs`: boolean to shorten working directory on windows platform
-- `branchesToNotify`: array of branches to send notifications of the build (default: `['master', 'main']`)
+- `branchesToNotify`: array of branches to send notifications of the build and deploy artifacts (default: `['master', 'main']`)
 
 Example to use a specific set of jdks and maven core
 ```
