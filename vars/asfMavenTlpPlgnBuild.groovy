@@ -40,7 +40,7 @@ def call(Map params = [:]) {
     // minimum, LTS, current and next ea
     def jdks = params.containsKey('jdks') ? params.jdks : params.containsKey('jdk') ? params.jdk : ['8','11','17','21']
     def jdkMin = jdks[0];
-    def mavens = params.containsKey('maven') ? params.maven : ['3.6.x', '3.9.x']
+    def mavens = params.containsKey('maven') ? params.maven : ['3.9.x']
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
