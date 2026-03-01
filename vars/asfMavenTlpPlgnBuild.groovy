@@ -22,10 +22,11 @@
 def call(Map params = [:]) {
   Map taskContext = [:]
   def branchesToNotify = params.containsKey("branchesToNotify") ? params.branchesToNotify : ['master', 'main']
+  def shouldDeploy = { branchesToNotify.contains(env.BRANCH_NAME) || env.BRANCH_NAME ==~ /maven-.*-3\.x/ }
 
   try {
     def buildProperties = []
-    if (env.BRANCH_NAME == 'master') {
+    if (shouldDeploy()) {
       // set build retention time first
       buildProperties.add(buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '15', numToKeepStr: '10')))
       // ensure a build is done every month
@@ -102,7 +103,7 @@ def call(Map params = [:]) {
     if (taskContext.failingFast != null) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${taskContext.failingFast}\n\n***** FAST FAILURE *****"
     }
-    if (branchesToNotify.contains(env.BRANCH_NAME)) {
+    if (shouldDeploy()) {
       stage("Notifications") {
         jenkinsNotify()
       }
@@ -136,7 +137,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 
   if (plan == 'build') {
       cmd += 'clean'
-      if (env.BRANCH_NAME == 'master' && jdk == '21' && maven == '3.9.x' && os == 'linux' ) {
+      if (shouldDeploy() && jdk == '21' && maven == '3.9.x' && os == 'linux' ) {
         cmd += 'deploy'
       } else {
         cmd += 'verify -Dpgpverify.skip'      
