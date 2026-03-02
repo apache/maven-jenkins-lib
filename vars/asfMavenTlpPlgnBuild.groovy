@@ -54,6 +54,7 @@ def call(Map params = [:]) {
     taskContext['tmpWs'] = tmpWs;
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
+    taskContext['shouldDeploy'] = shouldDeploy
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -137,7 +138,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
 
   if (plan == 'build') {
       cmd += 'clean'
-      if (shouldDeploy && jdk == '21' && maven == '3.9.x' && os == 'linux' ) {
+      if (taskContext.shouldDeploy && jdk == '21' && maven == '3.9.x' && os == 'linux' ) {
         cmd += 'deploy'
       } else {
         cmd += 'verify -Dpgpverify.skip'      
