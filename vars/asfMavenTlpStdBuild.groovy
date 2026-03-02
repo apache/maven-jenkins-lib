@@ -25,7 +25,7 @@ def call(Map params = [:]) {
   def shouldDeploy = { branchesToNotify.contains(env.BRANCH_NAME) || env.BRANCH_NAME ==~ /maven-.*-3\.x/ }
   try {
     def buildProperties = []
-    if (shouldDeploy()) {
+    if (shouldDeploy) {
       // set build retention time first
       buildProperties.add(buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '15', numToKeepStr: '10')))
       // ensure a build is done every month
@@ -70,7 +70,7 @@ def call(Map params = [:]) {
         }
         cmd += 'clean'
         cmd += mavenArgs
-        if (shouldDeploy() && jdk == '21' && os == 'linux' ) {
+        if (shouldDeploy && jdk == '21' && os == 'linux' ) {
           cmd += 'deploy'
         } else {
           cmd += 'verify -Dpgpverify.skip'
@@ -171,7 +171,7 @@ def call(Map params = [:]) {
     if (failingFast != null) {
       echo "***** FAST FAILURE *****\n\nFast failure triggered by ${failingFast}\n\n***** FAST FAILURE *****"
     }
-    if (shouldDeploy()) {
+    if (shouldDeploy) {
       stage("Notifications") {
         jenkinsNotify()
       }
