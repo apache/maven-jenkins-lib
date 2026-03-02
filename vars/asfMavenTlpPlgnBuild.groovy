@@ -22,7 +22,7 @@
 def call(Map params = [:]) {
   Map taskContext = [:]
   def branchesToNotify = params.containsKey("branchesToNotify") ? params.branchesToNotify : ['master', 'main']
-  def shouldDeploy = { branchesToNotify.contains(env.BRANCH_NAME) || env.BRANCH_NAME ==~ /maven-.*-3\.x/ }
+  def shouldDeploy = branchesToNotify.contains(env.BRANCH_NAME) || env.BRANCH_NAME ==~ /maven-.*-3\.x/
 
   try {
     def buildProperties = []
