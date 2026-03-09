@@ -97,7 +97,6 @@ def call(Map params = [:]) {
                               options: [
                                 artifactsPublisher(disabled: disablePublishers),
                                 junitPublisher(ignoreAttachments: false),
-                                findbugsPublisher(disabled: disablePublishers),
                                 openTasksPublisher(disabled: disablePublishers),
                                 dependenciesFingerprintPublisher(disabled: disablePublishers),
     // DISABLED DUE TO INFRA-17514 invokerPublisher(),
