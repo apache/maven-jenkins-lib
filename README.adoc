@@ -1,6 +1,8 @@
-== Apache Maven Jenkins Shared Libraries
+= Apache Maven Jenkins Shared Librariy
 
-This repository contains the Jenkins shared libraries that define the standard build process for Apache Maven subprojects.
+This repository contains the Jenkins shared library that define the standard build process for Apache Maven subprojects.
+It consist of two different https://www.jenkins.io/doc/book/pipeline/shared-libraries/#defining-custom-steps[entry points (custom steps)] 
+which can be referenced from Maven repo's `Jenkinsfile`:
 
 == asfMavenTlpPlgnBuild() (building Maven plugins)
 
@@ -31,3 +33,10 @@ Example to use a specific set of jdks and maven core
 ```
 asfMavenTlpStdBuild(jdks:[ "8", "11" ], maven: "3.6.x")
 ```
+
+== Configuration in Jenkins
+
+This library is configured globally in https://ci-maven.apache.org/manage/configure[ci-maven.apache.org system settings] with name `maven-jenkins-lib`.
+
+The `master` branch is https://www.jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries[loaded implicitly].
+You can reference another branch via https://www.jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries[`@Library('maven-jenkins-lib@mybranch') _`].
