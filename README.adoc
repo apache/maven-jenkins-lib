@@ -40,3 +40,8 @@ This library is configured globally in https://ci-maven.apache.org/manage/config
 
 The `master` branch is https://www.jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries[loaded implicitly].
 You can reference another branch via https://www.jenkins.io/doc/book/pipeline/shared-libraries/#using-libraries[`@Library('maven-jenkins-lib@mybranch') _`].
+
+== Downstream Dependencies
+
+This library uses custom steps provided by https://github.com/apache/maven-jenkins-env[Apache Maven Jenkins Environment Shared Library] which helps 
+referencing proper JDK/Maven installations available in Jenkins.
