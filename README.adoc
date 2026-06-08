@@ -11,11 +11,15 @@ This repository contains the Jenkins shared libraries that define the standard b
 - `siteJdk`: array of jdks used for the site build (default: `[11']`)
 - `siteMvn`: jdk used to build the site (default: `3.9.x`)
 - `tmpWs`: boolean to shorten working directory on windows platform
+- `fetchDepth`: optional git fetch depth for checkout; values `> 0` enable shallow checkout with that depth, values `<= 0` force non-shallow checkout. When not set the organization value is used.
 - `branchesToNotify`: array of branches to send notifications of the build (default: `['master', 'main']`)
 
 Example to use a specific set of jdks and maven core
 ```
 asfMavenTlpPlgnBuild(jdks:[ "8", "11" ], maven: ["3.8.x"])
+
+// checkout with explicit non-shallow clone
+asfMavenTlpPlgnBuild(fetchDepth: 0)
 ```
 
 == asfMavenTlpStdBuild() (building Other projects)
@@ -25,9 +29,13 @@ asfMavenTlpPlgnBuild(jdks:[ "8", "11" ], maven: ["3.8.x"])
 - `jdks`: array of jdks used for the build (default: `['8','11','17', '21']`)
 - `maven`: maven versions used for build (default: `3.9.x`)
 - `tmpWs`: boolean to shorten working directory on windows platform
+- `fetchDepth`: optional git fetch depth for checkout; values `> 0` enable shallow checkout with that depth, values `<= 0` force non-shallow checkout. When not set the organization value is used.
 - `branchesToNotify`: array of branches to send notifications of the build and deploy artifacts (default: `['master', 'main']`)
 
 Example to use a specific set of jdks and maven core
 ```
 asfMavenTlpStdBuild(jdks:[ "8", "11" ], maven: "3.6.x")
+
+// checkout with explicit non-shallow clone
+asfMavenTlpStdBuild(fetchDepth: 0)
 ```

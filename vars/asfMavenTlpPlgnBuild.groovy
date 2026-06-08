@@ -19,6 +19,8 @@
  * under the License.
  */
 
+import org.apache.maven.jenkins.GitCheckoutHelper
+
 def call(Map params = [:]) {
   Map taskContext = [:]
   def branchesToNotify = params.containsKey("branchesToNotify") ? params.branchesToNotify : ['master', 'main']
@@ -48,6 +50,7 @@ def call(Map params = [:]) {
     def siteJdks = params.containsKey('siteJdk') ? params.siteJdk : ['11']
     def siteMvn = params.containsKey('siteMvn') ? params.siteMvn : '3.9.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
+    def fetchDepth = params.containsKey('fetchDepth') ? params.fetchDepth : null
 
     
     taskContext['failFast'] = failFast;
@@ -55,6 +58,7 @@ def call(Map params = [:]) {
     taskContext['archives'] = params.archives
     taskContext['siteWithPackage'] = params.containsKey('siteWithPackage') ? params.siteWithPackage : false // workaround for MNG-7289
     taskContext['shouldDeploy'] = shouldDeploy
+    taskContext['fetchDepth'] = fetchDepth
 
     Map tasks = [failFast: failFast]
     boolean first = true
@@ -183,7 +187,7 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
                "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
              dir (stageDir) {
-               checkout scm
+               GitCheckoutHelper.checkoutScm(this, scm, taskContext.fetchDepth)
                if (isUnix()) {
                  sh 'df -hT'
                  sh cmd.join(' ')
@@ -223,3 +227,4 @@ def archiveDirs(archives, stageDir) {
     }
   }
 }
+

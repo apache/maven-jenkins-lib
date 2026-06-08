@@ -19,6 +19,8 @@
  * under the License.
  */
 
+import org.apache.maven.jenkins.GitCheckoutHelper
+
 def call(Map params = [:]) {
   def failingFast = null
   def branchesToNotify = params.containsKey("branchesToNotify") ? params.branchesToNotify : ['master', 'main']
@@ -42,6 +44,7 @@ def call(Map params = [:]) {
     def maven = params.containsKey('maven') ? params.maven : '3.9.x'
     def tmpWs = params.containsKey('tmpWs') ? params.tmpWs : false
     def mavenArgs = params.containsKey('mavenArgs') ? params.mavenArgs : ''
+    def fetchDepth = params.containsKey('fetchDepth') ? params.fetchDepth : null
     // def failFast = params.containsKey('failFast') ? params.failFast : true
     // Just temporarily
     def failFast = false;
@@ -102,7 +105,7 @@ def call(Map params = [:]) {
                                 pipelineGraphPublisher(disabled: disablePublishers)
                               ], publisherStrategy: 'EXPLICIT') {
                       dir ('m') {
-                        checkout scm
+                        GitCheckoutHelper.checkoutScm(this, scm, fetchDepth)
                         if (isUnix()) {
                           sh cmd.join(' ')
                         } else {
@@ -176,3 +179,4 @@ def call(Map params = [:]) {
     }
   }
 }
+
