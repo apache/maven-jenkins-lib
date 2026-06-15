@@ -1,4 +1,12 @@
 github:
+  description: "Jenkins shared library for Apache Maven CI pipelines"
+  labels:
+    - jenkins
+    - ci
+    - maven
+    - shared-library
+  features:
+    issues: true
   rulesets:
     - name: "Default Branch Protection"
       type: branch
