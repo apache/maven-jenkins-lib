@@ -47,7 +47,7 @@ class GitCheckoutHelper implements Serializable {
     def cloneOptions = [
       $class: 'CloneOption',
       shallow: shallowClone,
-      noTags: false
+      noTags: true
     ]
     if (shallowClone) {
       cloneOptions.depth = fetchDepthValue
