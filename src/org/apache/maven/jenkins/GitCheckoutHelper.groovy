@@ -25,12 +25,12 @@ class GitCheckoutHelper implements Serializable {
     * Performs a Git checkout with the specified configuration and fetch depth.
     *
     * @param script The Jenkins pipeline script context (usually 'this').
-    * @param scmConfig The SCM configuration for the Git checkout.
-    * @param fetchDepth The depth for shallow cloning (null or empty for full clone).
+    * @param scmConfig The SCM configuration for the Git checkout (set in the Jenkins job configuration).
+    * @param fetchDepth The depth for shallow cloning (null for using the default from scmConfig).
     */
   static void checkoutScm(def script, def scmConfig, def fetchDepth) {
     if (fetchDepth == null || "${fetchDepth}".trim().isEmpty()) {
-      // simple checkout (with the default scm configuration) if no fetch depth is specified
+      // simple checkout (with the job's scm configuration) if no explicit fetch depth is specified
       script.checkout(scmConfig)
       return
     }
