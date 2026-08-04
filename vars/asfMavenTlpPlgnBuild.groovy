@@ -188,7 +188,13 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
                "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
               dir (stageDir) {
                 GitCheckoutHelper.checkoutScm(this, scm, taskContext.fetchDepth)
-                def wrapperSetup = "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper -Dmaven=${maven}"
+                // -Dmaven= becomes a download URL, so it needs a real version:
+                // "4.0.x" would write apache-maven-4.0.x-bin.zip and 404 later.
+                String mvnVersion = jenkinsEnv.mvnVersionFromPattern("${maven}")
+                if (mvnVersion == null) {
+                  error "No concrete Maven version for '${maven}'; cannot provision the wrapper"
+                }
+                def wrapperSetup = "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper -Dmaven=${mvnVersion}"
                 def buildCmd = cmd.clone()
                 buildCmd[0] = isUnix() ? './mvnw' : 'mvnw.cmd'
                 if (isUnix()) {
