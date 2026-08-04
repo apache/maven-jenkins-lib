@@ -106,10 +106,15 @@ def call(Map params = [:]) {
                               ], publisherStrategy: 'EXPLICIT') {
                       dir ('m') {
                         GitCheckoutHelper.checkoutScm(this, scm, fetchDepth)
+                        def wrapperSetup = "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper -Dmaven=${maven}"
+                        def buildCmd = cmd.clone()
+                        buildCmd[0] = isUnix() ? './mvnw' : 'mvnw.cmd'
                         if (isUnix()) {
-                          sh cmd.join(' ')
+                          sh wrapperSetup
+                          sh buildCmd.join(' ')
                         } else {
-                          bat cmd.join(' ')
+                          bat wrapperSetup
+                          bat buildCmd.join(' ')
                         }
                       }
                     }

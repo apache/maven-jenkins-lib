@@ -186,15 +186,20 @@ def doCreateTask( os, jdk, maven, tasks, first, plan, taskContext )
             withEnv(["JAVA_HOME=${ tool "$jdkName" }",
                "PATH+MAVEN=${ tool "$jdkName" }/bin:${tool "$mvnName"}/bin",
                "MAVEN_OPTS=-Xms2g -Xmx4g -Djava.awt.headless=true"]) {
-             dir (stageDir) {
-               GitCheckoutHelper.checkoutScm(this, scm, taskContext.fetchDepth)
-               if (isUnix()) {
-                 sh 'df -hT'
-                 sh cmd.join(' ')
-               } else {
-                 bat 'wmic logicaldisk get size,freespace,caption'
-                 bat cmd.join(' ')
-                }
+              dir (stageDir) {
+                GitCheckoutHelper.checkoutScm(this, scm, taskContext.fetchDepth)
+                def wrapperSetup = "mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper -Dmaven=${maven}"
+                def buildCmd = cmd.clone()
+                buildCmd[0] = isUnix() ? './mvnw' : 'mvnw.cmd'
+                if (isUnix()) {
+                  sh 'df -hT'
+                  sh wrapperSetup
+                  sh buildCmd.join(' ')
+                } else {
+                  bat 'wmic logicaldisk get size,freespace,caption'
+                  bat wrapperSetup
+                  bat buildCmd.join(' ')
+                 }
               }
             }
           } catch (Throwable e) {
